@@ -3,9 +3,10 @@
 #include "expressions.hpp"
 namespace symspals
 {
-    struct Parameter : Matrix<Expression>
+    class Parameter : public Matrix<Expression>
     {
-        Parameter(const string &name, const int m, const int n) : Matrix<Expression>(SymMatrix(name, m, n)){};
+        public:
+        Parameter(const string &name, const int m, const int n) : Matrix<Expression>(SymMatrix(name, m, n)), value_(m,n){};
         void set_value(const Matrix<double> &value)
         {
             dirty = false;
@@ -35,9 +36,8 @@ namespace symspals
         }
         shared_ptr<Parameter> parameter(int m, int n)
         {
-            auto sym = SymMatrix("p", m, n);
-            parameters_syms.push_back(sym);
             parameters.push_back(make_shared<Parameter>("p", m, n));
+            parameters_syms.push_back(*parameters.back());
             dirty = true;
             return parameters.back();
         }
@@ -142,8 +142,9 @@ namespace symspals
             // evaluate the parameters
             for (auto p : parameters)
             {
-                auto p_vals = vec(p->get_value());
-                parameters_vals.insert(parameters_vals.end(), p_vals.begin(), p_vals.end());
+                const Matrix<double> & p_vals = p->get_value();
+                const vector<double> & p_vals_vec = vec(p_vals);
+                parameters_vals.insert(parameters_vals.end(), p_vals_vec.begin(), p_vals_vec.end());
             }
             dirty = false;
         }

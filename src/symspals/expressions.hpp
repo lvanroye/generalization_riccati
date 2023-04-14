@@ -41,7 +41,7 @@ namespace symspals
     class Expression : public shared_ptr<Node>
     {
     public:
-        Expression():shared_ptr<Node>(nullptr){}
+        Expression() : shared_ptr<Node>(nullptr) {}
         Expression(const double val); // forward declaration, implemented after ConstNode is defined;
         Expression(const shared_ptr<Node> &ptr) : shared_ptr<Node>(ptr){};
         template <typename Derived>
@@ -193,11 +193,11 @@ namespace symspals
         {
             return expr1->value() * expr2->value();
         }
-        if (expr1 ->equals(ConstNode(1.0)))
+        if (expr1->equals(ConstNode(1.0)))
         {
             return expr2;
         }
-        if (expr2 ->equals(ConstNode(1.0)))
+        if (expr2->equals(ConstNode(1.0)))
         {
             return expr1;
         }
@@ -513,11 +513,13 @@ namespace symspals
             {
                 // find the index of expr in ordered_expression
                 auto it = find(ordered_expression.begin(), ordered_expression.end(), expr);
-                if(it == ordered_expression.end()) throw runtime_error("error in Function constructor");
+                if (it == ordered_expression.end())
+                    throw runtime_error("error in Function constructor");
                 int index = it - ordered_expression.begin();
                 // find the index of expr in output
                 auto it2 = find(output.begin(), output.end(), expr);
-                if(it2 == output.end()) throw runtime_error("error in Function constructor");
+                if (it2 == output.end())
+                    throw runtime_error("error in Function constructor");
                 int index2 = it2 - output.begin();
                 AlgEl el({OUTPUT, index, index2, 0.0});
                 algorithm.push_back(el);
@@ -568,7 +570,8 @@ namespace symspals
     {
     public:
         Matrix() : Matrix{0, 0} {};
-        Matrix(const T& val) : Matrix{1,1}{data[0] = val;};
+        Matrix(const T &val) : Matrix{1, 1} { data[0] = val; };
+        Matrix(const vector<T>& val) : Matrix{1, 1} { data = val; };
         Matrix(const int n_rows, const int n_cols) : n_rows_(n_rows), n_cols_(n_cols)
         {
             data.resize(n_rows * n_cols, T(0.0));
@@ -645,6 +648,24 @@ namespace symspals
             }
         };
     };
+    class Constv : public Matrix<Expression>
+    {
+    public:
+        Constv(const double &val) : Matrix{1, 1}
+        {
+            (*this)(0, 0) = val;
+        }
+        Constv(const vector<double> &val) : Matrix(val.size(), 1)
+        {
+            for (int i = 0; i < n_rows(); i++)
+            {
+                for (int j = 0; j < n_cols(); j++)
+                {
+                    (*this)(i, j) = val[i + j * n_rows()];
+                }
+            }
+        };
+    };
 
     class SymMatrix : public Matrix<Expression>
     {
@@ -691,7 +712,7 @@ namespace symspals
         {
             for (int j = 0; j < n_cols; j++)
             {
-                    C(i, j) = C(i, j) + expr * B(i, j);
+                C(i, j) = C(i, j) + expr * B(i, j);
             }
         }
         return C;

@@ -6,6 +6,14 @@
         "limits": "cpp",
         "ostream": "cpp",
         "condition_variable": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "*.tcc": "cpp",
+        "complex": "cpp",
+        "bitset": "cpp",
+        "memory": "cpp",
+        "random": "cpp",
+        "tuple": "cpp",
+        "atomic": "cpp",
+        "variant": "cpp"
     }
 }
