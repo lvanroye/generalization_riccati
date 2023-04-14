@@ -8,8 +8,8 @@ int main()
     auto z = ls.variable(2);
     auto a = ls.parameter(1,1);
     a ->set_value({100000.});
-    ls.add_equation(69*x + (Constv(13.) + *a)*y, 420);
-    ls.add_equation(y, Constv(2) + *a);
+    ls.add_equation(69*x + (13. + *a)*y, 420);
+    ls.add_equation(y, 2 + *a);
     ls.add_equation(123*z, Constv({101., 505.}));
     auto sps = ls.get_sparsity();
     auto coeffs = ls.eval_coeffs();

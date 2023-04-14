@@ -718,8 +718,7 @@ namespace symspals
         return C;
     }
 
-    template <typename T>
-    Matrix<T> operator+(const Matrix<T> &A, const Matrix<T> &B)
+    Matrix<Expression> operator+(const Matrix<Expression> &A, const Matrix<Expression> &B)
     {
         int n_rows = A.n_rows();
         int n_cols = A.n_cols();
@@ -733,6 +732,35 @@ namespace symspals
         }
         return C;
     }
+    Matrix<Expression> operator+(const Matrix<Expression> &A, const Constv &B)
+    {
+        int n_rows = A.n_rows();
+        int n_cols = A.n_cols();
+        Zerom C(n_rows, n_cols);
+        for (int i = 0; i < n_rows; i++)
+        {
+            for (int j = 0; j < n_cols; j++)
+            {
+                C(i, j) = A(i, j) + B(i, j);
+            }
+        }
+        return C;
+    }
+    Matrix<Expression> operator+(const Constv &A, const Matrix<Expression> &B)
+    {
+        int n_rows = A.n_rows();
+        int n_cols = A.n_cols();
+        Zerom C(n_rows, n_cols);
+        for (int i = 0; i < n_rows; i++)
+        {
+            for (int j = 0; j < n_cols; j++)
+            {
+                C(i, j) = A(i, j) + B(i, j);
+            }
+        }
+        return C;
+    }
+    
 
     template <typename T>
     vector<T> vec(const Matrix<T> &mat)
