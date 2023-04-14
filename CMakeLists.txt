@@ -3,9 +3,11 @@ project(symspals VERSION 0.1.0 LANGUAGES CXX)
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 
-add_library(symspals SHARED src/symspals/symspals.cpp src/symspals/expressions.hpp src/symspals/sparse_system.hpp)
+add_library(symspals SHARED src/symspals/symspals.cpp)
 add_executable(expressions_example src/symspals/expressions_example.cpp)
 add_executable(sparse_system_example src/symspals/sparse_system_example.cpp)
+target_link_libraries(expressions_example symspals)
+target_link_libraries(sparse_system_example symspals)
 
 include(CPack)
 

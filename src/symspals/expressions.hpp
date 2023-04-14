@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <algorithm>
 using namespace std;
-namespace SpaLS
+namespace symspals
 {
     class Expression; // forward declaration
     class Sym;        // forward declaration
@@ -41,6 +41,7 @@ namespace SpaLS
     class Expression : public shared_ptr<Node>
     {
     public:
+        Expression():shared_ptr<Node>(nullptr){}
         Expression(const double val); // forward declaration, implemented after ConstNode is defined;
         Expression(const shared_ptr<Node> &ptr) : shared_ptr<Node>(ptr){};
         template <typename Derived>
@@ -49,7 +50,7 @@ namespace SpaLS
             return Expression(make_shared<Derived>(node));
         }
         friend ostream &operator<<(ostream &os, const Expression &expr) { return expr->print(os); };
-        bool operator==(const Expression &expr) const { return this->get()->equals(*expr.get()); };
+        // bool operator==(const Expression &expr) const { return this->get()->equals(*expr.get()); };
     };
 
     class LeafNode : public Node
@@ -192,11 +193,11 @@ namespace SpaLS
         {
             return expr1->value() * expr2->value();
         }
-        if (expr1 == 1.0)
+        if (expr1 ->equals(ConstNode(1.0)))
         {
             return expr2;
         }
-        if (expr2 == 1.0)
+        if (expr2 ->equals(ConstNode(1.0)))
         {
             return expr1;
         }
@@ -387,12 +388,12 @@ namespace SpaLS
 
     void OrderDepthFirstRecurse(const Expression expr, vector<Expression> &result)
     {
-        // check if expr is already in result
-        if (find(result.begin(), result.end(), expr) != result.end())
-        {
-            return;
-        }
-        // check if expression is a TwoNode
+        // // check if expr is already in result
+        // if (find(result.begin(), result.end(), expr) != result.end())
+        // {
+        //     return;
+        // }
+        // check if expression is a binary
         if (expr->is_binary())
         {
             auto expr1 = expr->dep(0);
@@ -512,9 +513,11 @@ namespace SpaLS
             {
                 // find the index of expr in ordered_expression
                 auto it = find(ordered_expression.begin(), ordered_expression.end(), expr);
+                if(it == ordered_expression.end()) throw runtime_error("error in Function constructor");
                 int index = it - ordered_expression.begin();
                 // find the index of expr in output
                 auto it2 = find(output.begin(), output.end(), expr);
+                if(it2 == output.end()) throw runtime_error("error in Function constructor");
                 int index2 = it2 - output.begin();
                 AlgEl el({OUTPUT, index, index2, 0.0});
                 algorithm.push_back(el);
@@ -536,6 +539,7 @@ namespace SpaLS
                 case OUTPUT:
                     work.push_back(0.0);
                     result.at(el.arg2) = work.at(el.arg1);
+                    break;
                 case PLUS:
                     work.push_back(work.at(el.arg1) + work.at(el.arg2));
                     break;
@@ -564,6 +568,7 @@ namespace SpaLS
     {
     public:
         Matrix() : Matrix{0, 0} {};
+        Matrix(const T& val) : Matrix{1,1}{data.push_back(val);};
         Matrix(const int n_rows, const int n_cols) : n_rows_(n_rows), n_cols_(n_cols)
         {
             data.resize(n_rows * n_cols, T(0.0));
@@ -580,8 +585,8 @@ namespace SpaLS
         };
         void operator=(const Matrix<T> &A)
         {
-            n_rows_ = A.n_rows();
-            n_cols_ = A.n_cols();
+            // assert(n_rows_ == A.n_rows());
+            // assert(n_cols_ == A.n_cols());
             data = A.data;
         };
 

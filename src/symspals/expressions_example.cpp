@@ -1,6 +1,6 @@
 #include <iostream>
 #include "expressions.hpp"
-using namespace SpaLS;
+using namespace symspals;
 int main()
 {
     Sym a("a");
@@ -19,9 +19,13 @@ int main()
     // coefficients
     cout << "coefficients: "<< endl;
     for (auto coeff : coeffs)
-        // cout << coeff.row << endl;
-        // cout << coeff.col << endl;
         cout << coeff.value << endl;
+
+    
+    auto coeffs_v = Function({a, b, c}, {coeffs.at(0).value, coeffs.at(1).value}).Eval({1, 2, 3});
+    for (auto coeff: coeffs_v)
+    {
+        cout << coeff << endl;
+    }
     return 0;
-    // linear_system.add_equation(-X.at(k+1) + A.at(K) * X.at(k) + B.at(k) * U.at(k), 0);
 };

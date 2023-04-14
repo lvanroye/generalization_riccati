@@ -1,10 +1,11 @@
 #ifndef SPARSEMATRIXINCLUDED
 #define SPARSEMATRIXINCLUDED
 #include "expressions.hpp"
-namespace SpaLS
+namespace symspals
 {
-    struct Parameter
+    struct Parameter : Matrix<Expression>
     {
+        Parameter(const string &name, const int m, const int n) : Matrix<Expression>(SymMatrix(name, m, n)){};
         void set_value(const Matrix<double> &value)
         {
             dirty = false;
