@@ -112,6 +112,7 @@ namespace symspals
         vector<Expression> coeffs;
         Function coeffs_f; // computes coefficients from parameters
         Function rhs_f;
+        string triplet_order = "ma57";
 
     private:
         void make_clean()
@@ -125,10 +126,13 @@ namespace symspals
             const int n_eq = equations.size();
             const int n_var = variables.size();
             // go trough all triplets
-            for (auto triplet : triplets)
+            if (triplet_order == "ma57")
             {
-                sparsity.push_back(triplet.index);
-                coeffs.push_back(triplet.value);
+                for (auto triplet : triplets)
+                {
+                    sparsity.push_back(triplet.index);
+                    coeffs.push_back(triplet.value);
+                }
             }
 
             // initialize the function that computes the coefficients
