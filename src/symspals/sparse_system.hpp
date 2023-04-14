@@ -48,6 +48,12 @@ namespace symspals
             rhss.push_back(rhs);
             dirty = true;
         }
+        void add_equation(const Matrix<Expression> &lhs, const Expression &rhs)
+        {
+            equations.push_back(lhs);
+            rhss.push_back(Matrix<Expression>(rhs));
+            dirty = true;
+        }
         vector<Expression> get_coeffs()
         {
             if (dirty)
@@ -59,6 +65,12 @@ namespace symspals
             if (dirty)
                 make_clean();
             return coeffs_f.Eval(parameters_vals);
+        }
+        vector<double> eval_rhs()
+        {
+            if (dirty)
+                make_clean();
+            return rhs_f.Eval(parameters_vals);
         }
         vector<Index> get_sparsity()
         {
@@ -99,6 +111,7 @@ namespace symspals
         vector<Index> sparsity;
         vector<Expression> coeffs;
         Function coeffs_f; // computes coefficients from parameters
+        Function rhs_f;
 
     private:
         void make_clean()
@@ -117,8 +130,11 @@ namespace symspals
                 sparsity.push_back(triplet.index);
                 coeffs.push_back(triplet.value);
             }
+
             // initialize the function that computes the coefficients
             coeffs_f = Function(vec(parameters_syms), coeffs);
+            rhs_f = Function(vec(parameters_syms), vec(rhss));
+
             // evaluate the parameters
             for (auto p : parameters)
             {

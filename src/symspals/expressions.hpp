@@ -568,7 +568,7 @@ namespace symspals
     {
     public:
         Matrix() : Matrix{0, 0} {};
-        Matrix(const T& val) : Matrix{1,1}{data.push_back(val);};
+        Matrix(const T& val) : Matrix{1,1}{data[0] = val;};
         Matrix(const int n_rows, const int n_cols) : n_rows_(n_rows), n_cols_(n_cols)
         {
             data.resize(n_rows * n_cols, T(0.0));
