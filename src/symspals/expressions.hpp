@@ -571,7 +571,7 @@ namespace symspals
     public:
         Matrix() : Matrix{0, 0} {};
         Matrix(const T &val) : Matrix{1, 1} { data[0] = val; };
-        Matrix(const vector<T>& val) : Matrix{1, 1} { data = val; };
+        Matrix(const vector<T> &val) : Matrix{1, 1} { data = val; };
         Matrix(const int n_rows, const int n_cols) : n_rows_(n_rows), n_cols_(n_cols)
         {
             data.resize(n_rows * n_cols, T(0.0));
@@ -702,6 +702,24 @@ namespace symspals
         return C;
     }
 
+    Matrix<Expression> tril(const Matrix<Expression> &A)
+    {
+        int n_rows = A.n_rows();
+        int n_cols = A.n_cols();
+        Zerom C(n_rows, n_cols);
+        for (int i = 0; i < n_rows; i++)
+        {
+            for (int j = 0; j < n_cols; j++)
+            {
+                if (i >= j)
+                {
+                    C(i, j) = A(i, j);
+                }
+            }
+        }
+        return C;
+    }
+
     template <typename T>
     Matrix<T> operator*(const Expression &expr, const Matrix<T> &B)
     {
@@ -760,7 +778,6 @@ namespace symspals
         }
         return C;
     }
-    
 
     template <typename T>
     vector<T> vec(const Matrix<T> &mat)
