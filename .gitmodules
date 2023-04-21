@@ -1,3 +1,6 @@
 [submodule "external/fatrop"]
 	path = external/fatrop
 	url = https://gitlab.kuleuven.be/robotgenskill/fatrop/fatrop.git
+[submodule "external/mumps"]
+	path = external/mumps
+	url = https://github.com/scivision/mumps.git
