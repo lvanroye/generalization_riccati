@@ -9,6 +9,9 @@ add_executable(sparse_system_example src/symspals/sparse_system_example.cpp)
 target_link_libraries(expressions_example symspals)
 target_link_libraries(sparse_system_example symspals)
 
+
+add_subdirectory(external)
+
 include(CPack)
 
 # make the symspals library installable as a cmake package
