@@ -7,6 +7,7 @@
 #include <vector>
 #include <type_traits>
 #include <algorithm>
+#include <initializer_list>
 using namespace std;
 namespace symspals
 {
@@ -569,12 +570,16 @@ namespace symspals
     class Matrix
     {
     public:
-        Matrix() : Matrix{0, 0} {};
-        Matrix(const T &val) : Matrix{1, 1} { data[0] = val; };
-        Matrix(const vector<T> &val) : Matrix{1, 1} { data = val; };
+        Matrix() : Matrix(0, 0) {};
         Matrix(const int n_rows, const int n_cols) : n_rows_(n_rows), n_cols_(n_cols)
         {
             data.resize(n_rows * n_cols, T(0.0));
+        };
+        Matrix(const T &val) : Matrix(1, 1) { data[0] = val; };
+        Matrix(const vector<T> &val) : Matrix(val.size(), 1) { data = val; };
+        Matrix(const initializer_list<T> &val) : Matrix(val.size(), 1) {
+            // copy 
+            copy(val.begin(), val.end(), data.begin());
         };
         T &operator()(int i, int j) { return data[i + n_rows_ * j]; };
         const T &operator()(int i, int j) const { return data[i + n_rows_ * j]; };
@@ -586,17 +591,11 @@ namespace symspals
         {
             return n_cols_;
         };
-        void operator=(const Matrix<T> &A)
-        {
-            // assert(n_rows_ == A.n_rows());
-            // assert(n_cols_ == A.n_cols());
-            data = A.data;
-        };
 
     protected:
         vector<T> data;
-        const int n_rows_;
-        const int n_cols_;
+        int n_rows_;
+        int n_cols_;
     };
 
     template <typename T>
@@ -651,7 +650,7 @@ namespace symspals
     class Constv : public Matrix<Expression>
     {
     public:
-        Constv(const double &val) : Matrix{1, 1}
+        Constv(const double &val) : Matrix(1, 1)
         {
             (*this)(0, 0) = val;
         }

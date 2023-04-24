@@ -1,27 +1,17 @@
 #ifndef SPARSEMATRIXINCLUDED
 #define SPARSEMATRIXINCLUDED
 #include "expressions.hpp"
+#include <unordered_map>
 namespace symspals
 {
-    class Parameter : public Matrix<Expression>
+    class Parameter : public shared_ptr<Matrix<Expression>>
     {
-        public:
-        Parameter(const string &name, const int m, const int n) : Matrix<Expression>(SymMatrix(name, m, n)), value_(m,n){};
-        void set_value(const Matrix<double> &value)
+    public:
+        Parameter(const string &name, const int m, const int n) : shared_ptr<Matrix<Expression>>(make_shared<SymMatrix>(name, m, n)){};
+        operator Matrix<Expression> &()
         {
-            dirty = false;
-            value_ = value;
-        }
-        const Matrix<double> &get_value()
-        {
-            if (dirty)
-                throw runtime_error("Parameter value not set");
-            return value_;
-        }
-
-    private:
-        bool dirty = true;
-        Matrix<double> value_;
+            return *this->get();
+        };
     };
 
     class SparseLinearSystem
@@ -34,12 +24,13 @@ namespace symspals
             dirty = true;
             return sym;
         }
-        shared_ptr<Parameter> parameter(int m, int n)
+        Parameter parameter(int m, int n)
         {
-            parameters.push_back(make_shared<Parameter>("p", m, n));
-            parameters_syms.push_back(*parameters.back());
+            auto res = Parameter("p", m, n);
+            parameters[res] = Matrix<double>(m, n);
+            parameters_syms.push_back(res);
             dirty = true;
-            return parameters.back();
+            return res;
         }
 
         void add_equation(const Matrix<Expression> &lhs, const Matrix<Expression> &rhs)
@@ -60,16 +51,32 @@ namespace symspals
                 make_clean();
             return coeffs;
         }
+        void set_value(const Parameter &p, const Matrix<double> &value)
+        {
+            parameters[p] = value;
+        };
+        void eval_params()
+        {
+            parameters_vals.resize(0);
+            for (auto p : parameters_syms)
+            {
+                const Matrix<double> &p_vals = parameters[p];
+                const vector<double> &p_vals_vec = vec(p_vals);
+                parameters_vals.insert(parameters_vals.end(), p_vals_vec.begin(), p_vals_vec.end());
+            }
+        }
         vector<double> eval_coeffs()
         {
             if (dirty)
                 make_clean();
+            eval_params();
             return coeffs_f.Eval(parameters_vals);
         }
         vector<double> eval_rhs()
         {
             if (dirty)
                 make_clean();
+            eval_params();
             return rhs_f.Eval(parameters_vals);
         }
         vector<Index> get_sparsity()
@@ -103,8 +110,8 @@ namespace symspals
         {
         }
         vector<Matrix<Expression>> variables;
-        vector<Matrix<Expression>> parameters_syms;
-        vector<shared_ptr<Parameter>> parameters;
+        vector<Parameter> parameters_syms;
+        unordered_map<shared_ptr<Matrix<Expression>>, Matrix<double>> parameters;
         vector<double> parameters_vals;
         vector<Matrix<Expression>> equations;
         vector<Matrix<Expression>> rhss;
@@ -134,18 +141,16 @@ namespace symspals
                     coeffs.push_back(triplet.value);
                 }
             }
+            vector<Expression> parameter_sym_vec;
+            for (auto p : parameters_syms)
+            {
+                auto p_vec = vec(*p);
+                parameter_sym_vec.insert(parameter_sym_vec.end(), p_vec.begin(), p_vec.end());
+            }
 
             // initialize the function that computes the coefficients
-            coeffs_f = Function(vec(parameters_syms), coeffs);
-            rhs_f = Function(vec(parameters_syms), vec(rhss));
-
-            // evaluate the parameters
-            for (auto p : parameters)
-            {
-                const Matrix<double> & p_vals = p->get_value();
-                const vector<double> & p_vals_vec = vec(p_vals);
-                parameters_vals.insert(parameters_vals.end(), p_vals_vec.begin(), p_vals_vec.end());
-            }
+            coeffs_f = Function(parameter_sym_vec, coeffs);
+            rhs_f = Function(parameter_sym_vec, vec(rhss));
             dirty = false;
         }
         bool dirty = true;

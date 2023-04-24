@@ -7,10 +7,10 @@ int main()
     auto y = ls.variable(1);
     auto z = ls.variable(2);
     auto a = ls.parameter(1,1);
-    a ->set_value({100000.});
-    ls.add_equation(69*x + (13. + *a)*y, 420);
-    ls.add_equation(y, 2 + *a);
-    ls.add_equation(123*z, Constv({101., 505.}));
+    ls.add_equation(69*x + (13. + a)*y, 420);
+    ls.add_equation(y, 2 + a);
+    ls.add_equation(123.*z, {101., 505.});
+    ls.set_value(a, 10000.);
     auto sps = ls.get_sparsity();
     auto coeffs = ls.eval_coeffs();
     auto rhs = ls.eval_rhs();
