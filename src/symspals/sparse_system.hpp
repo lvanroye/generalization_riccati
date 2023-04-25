@@ -1,6 +1,9 @@
 #ifndef SPARSEMATRIXINCLUDED
 #define SPARSEMATRIXINCLUDED
 #include "expressions.hpp"
+#include "interfaces/sparse_solver_interface.hpp"
+#include "interfaces/mumps.hpp"
+#include <memory>
 #include <unordered_map>
 namespace symspals
 {
@@ -85,29 +88,43 @@ namespace symspals
                 make_clean();
             return sparsity;
         }
-        // void solver(const )
         void solver(const string &solver_name)
         {
             dirty = true;
             if (solver_name == "ma57")
             {
-                // ma57
+                linear_solver = "ma57";
             }
             else if (solver_name == "mumps")
             {
-                // mumps
+                linear_solver = "mumps";
             }
             else if (solver_name == "pardiso")
             {
-                // pardiso
+                linear_solver = "pardiso";
             }
             else
             {
                 throw runtime_error("Unknown solver");
             }
         }
+        Function evaluator(const Matrix<Expression>& expr)
+        {
+            return Function(vec(variables), vec(expr));
+        }
         void solve(vector<double> &solution)
         {
+            if (dirty)
+                make_clean();
+            eval_params();
+            solver_ptr->set_coefficient_matrix(coeffs_f.Eval(parameters_vals));
+            solution = rhs_f.Eval(parameters_vals);
+            solver_ptr->solve(solution);
+        }
+        bool is_lower_triangular()
+        {
+            // iterate through triplets and check wether lower triangular
+            return true;
         }
         vector<Matrix<Expression>> variables;
         vector<Parameter> parameters_syms;
@@ -119,7 +136,8 @@ namespace symspals
         vector<Expression> coeffs;
         Function coeffs_f; // computes coefficients from parameters
         Function rhs_f;
-        string triplet_order = "ma57";
+        string linear_solver = "ma57";
+        unique_ptr<SparseSolverInterface> solver_ptr;
 
     private:
         void make_clean()
@@ -130,16 +148,21 @@ namespace symspals
             auto eq_vec = vec(equations);
             auto var_vec = vec(variables);
             auto triplets = GetCoefficients(eq_vec, var_vec);
-            const int n_eq = equations.size();
-            const int n_var = variables.size();
+            // const int n_eq = equations.size();
+            // const int n_var = variables.size();
             // go trough all triplets
-            if (triplet_order == "ma57")
+            for (auto triplet : triplets)
             {
-                for (auto triplet : triplets)
-                {
-                    sparsity.push_back(triplet.index);
-                    coeffs.push_back(triplet.value);
-                }
+                sparsity.push_back(triplet.index);
+                coeffs.push_back(triplet.value);
+            }
+            if (linear_solver == "ma57")
+            {
+            }
+            else if (linear_solver == "mumps")
+            {
+                solver_ptr = make_unique<InterfaceMUMPS>(var_vec.size(), sparsity);
+                solver_ptr->preprocess();
             }
             vector<Expression> parameter_sym_vec;
             for (auto p : parameters_syms)
@@ -154,6 +177,27 @@ namespace symspals
             dirty = false;
         }
         bool dirty = true;
+    };
+
+    class KKTSystem : public SparseLinearSystem
+    {
+    public:
+        // lower triangular
+        SymMatrix variable(const Matrix<Expression> &hess_block, const Matrix<Expression> &grad)
+        {
+            int size = hess_block.n_cols();
+            auto var = SparseLinearSystem::variable(size);
+            add_equation(tril(hess_block) * var, -grad);
+            return var;
+        }
+        SymMatrix add_constraint(const Matrix<Expression> &constraint, const Matrix<Expression> &rhs)
+        {
+            auto lag = SparseLinearSystem::variable(constraint.n_rows());
+            lags.push_back(lag);
+            add_equation(constraint, rhs);
+            return lag;
+        }
+        vector<Matrix<Expression>> lags;
     };
 }
 

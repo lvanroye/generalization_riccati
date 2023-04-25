@@ -8,6 +8,7 @@
 #include <type_traits>
 #include <algorithm>
 #include <initializer_list>
+#include "common.hpp" 
 using namespace std;
 namespace symspals
 {
@@ -307,18 +308,6 @@ namespace symspals
         return terms;
     };
 
-    struct Index
-    {
-        int row = 0;
-        int col = 0;
-    };
-    template <typename T>
-    struct Triplet
-    {
-        Index index;
-        T value;
-        Triplet(int row, int col, T value) : index{row, col}, value(value){};
-    };
 
     template <typename T>
     class TripletVec : public vector<Triplet<T>>
@@ -341,7 +330,7 @@ namespace symspals
     TripletVec<Expression> GetCoefficients(const vector<Expression> &expr_vec, const vector<Expression> &sym_vec)
     {
         TripletVec<Expression> ret;
-        for (int i = 0; i < expr_vec.size(); i++)
+        for (size_t i = 0; i < expr_vec.size(); i++)
         {
             Expression expr = expr_vec.at(i);
             // vector<Expression> coefficients(sym_vec.size(), 0.0);
@@ -354,7 +343,7 @@ namespace symspals
                 int count = 0;
                 int coeff_ind = 0;
                 Expression coeff(1.0);
-                for (int j = 0; j < sym_vec.size(); j++)
+                for (size_t j = 0; j < sym_vec.size(); j++)
                 {
                     auto sym = sym_vec.at(j);
                     // check if the symbol is in the term
@@ -562,6 +551,7 @@ namespace symspals
         }
         vector<AlgEl> algorithm;
         vector<double> work;
+        vector<Expression> work_e;
         int output_size;
     };
 
@@ -597,6 +587,8 @@ namespace symspals
         int n_rows_;
         int n_cols_;
     };
+    
+
 
     template <typename T>
     ostream &operator<<(ostream &os, const Matrix<T> &A)
@@ -701,6 +693,7 @@ namespace symspals
         return C;
     }
 
+
     Matrix<Expression> tril(const Matrix<Expression> &A)
     {
         int n_rows = A.n_rows();
@@ -733,6 +726,10 @@ namespace symspals
             }
         }
         return C;
+    }
+    Matrix<Expression> operator-(const Matrix<Expression> &expr1)
+    {
+        return Const(-1.0) * expr1;
     }
 
     Matrix<Expression> operator+(const Matrix<Expression> &A, const Matrix<Expression> &B)

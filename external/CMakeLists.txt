@@ -1,4 +1,5 @@
 add_subdirectory(fatrop)
 include_directories("fatrop/fatrop")
 set(metis ON CACHE BOOL "metis ordering library" FORCE)
+set(parallel off CACHE BOOL "parallel" FORCE)
 add_subdirectory(mumps)
