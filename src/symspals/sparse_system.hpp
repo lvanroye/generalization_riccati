@@ -19,6 +19,7 @@ namespace symspals
 
     class SparseLinearSystem
     {
+        // implementation assumes LOWER triangular matrix of symmetric system: TODO make this more general
     public:
         SymMatrix variable(int size)
         {
@@ -108,7 +109,7 @@ namespace symspals
                 throw runtime_error("Unknown solver");
             }
         }
-        Function evaluator(const Matrix<Expression>& expr)
+        Function evaluator(const Matrix<Expression> &expr)
         {
             return Function(vec(variables), vec(expr));
         }
@@ -125,6 +126,28 @@ namespace symspals
         {
             // iterate through triplets and check wether lower triangular
             return true;
+        }
+        void residu(const vector<double> &sol, vector<double> &res)
+        {
+            int n_vars = variables.size();
+            res.resize(n_vars);
+            vector<double> coeffs_vals = eval_coeffs();
+            vector<double> rhs_vals = eval_rhs();
+            // add rhs to res
+            for (int i = 0; i < n_vars; i++)
+            {
+                res[i] = -rhs_vals[i];
+            }
+            // iterate over all non-zero coefficients
+            for (size_t i = 0; i < coeffs_vals.size(); i++)
+            {
+                int row = sparsity[i].row;
+                int col = sparsity[i].col;
+                res[row] += coeffs_vals[i] * sol[col];
+                // assume only lower triangular part of SYMMETRIC matrix is stored
+                if (row != col)
+                    res[col] += coeffs_vals[i] * sol[row];
+            }
         }
         vector<Matrix<Expression>> variables;
         vector<Parameter> parameters_syms;

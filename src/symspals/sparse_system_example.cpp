@@ -34,10 +34,33 @@ int main()
     kkt.add_constraint(x_kkt + y_kkt + z_kkt, {0});
     kkt.add_constraint(x_kkt + y_kkt, {0});
     kkt.solver("mumps");
+    sps = kkt.get_sparsity();
+    coeffs = kkt.eval_coeffs();
+    rhs = kkt.eval_rhs();
+    // print the sparsity pattern and value
+    cout << "Sparsity pattern: " << endl;
+    for(size_t i = 0; i < sps.size(); i++)
+    {
+        auto sp = sps[i];
+        auto coeff = coeffs[i];
+        cout << "(" << sp.row << ", " << sp.col << ") --> " << coeff << endl;
+    }
+
+    cout << "rhs: " << endl;
+    for(auto r : rhs)
+        cout << r << endl;
+
     vector<double> res;
     kkt.solve(res);
     cout << kkt.evaluator(x_kkt).Eval(res).at(0) << endl;
+    cout << "found solution: " << endl;
     for(auto r : res)
+        cout << r << endl;
+    // compute and print the residu
+    cout << "residu: " << endl;
+    vector<double> residu;
+    kkt.residu(res, residu);
+    for(auto r : residu)
         cout << r << endl;
     return 0;
 }
