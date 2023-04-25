@@ -5,9 +5,5 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g -fopenmp -O0 -DPANEL_SIZE=${PANEL_SIZE} -Wall -Wextra -Wno-unused-parameter")
 
-
-
 add_subdirectory(external)
 add_subdirectory(src)
-
-include(CPack)
