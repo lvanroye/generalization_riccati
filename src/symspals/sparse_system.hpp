@@ -3,6 +3,7 @@
 #include "expressions.hpp"
 #include "interfaces/sparse_solver_interface.hpp"
 #include "interfaces/mumps.hpp"
+#include "interfaces/ma57.hpp"
 #include <memory>
 #include <unordered_map>
 namespace symspals
@@ -181,6 +182,8 @@ namespace symspals
             }
             if (linear_solver == "ma57")
             {
+                solver_ptr = make_unique<InterfaceMA57>(var_vec.size(), sparsity);
+                solver_ptr->preprocess();
             }
             else if (linear_solver == "mumps")
             {

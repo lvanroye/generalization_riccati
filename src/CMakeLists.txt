@@ -1,4 +1,4 @@
-add_library(symspals SHARED symspals/symspals.cpp)
+add_library(symspals SHARED symspals/symspals.cpp ../external/ma57_src/ddeps.f ../external/ma57_src/fakemetis.f ../external/ma57_src/ma57d.f)
 target_link_libraries(symspals MUMPS)
 add_executable(expressions_example symspals/expressions_example.cpp)
 add_executable(sparse_system_example symspals/sparse_system_example.cpp)

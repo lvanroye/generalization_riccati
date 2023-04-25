@@ -33,7 +33,7 @@ int main()
     auto z_kkt = kkt.variable({2}, {1});
     kkt.add_constraint(x_kkt + y_kkt + z_kkt, {0});
     kkt.add_constraint(x_kkt + y_kkt, {0});
-    kkt.solver("mumps");
+    kkt.solver("ma57");
     sps = kkt.get_sparsity();
     coeffs = kkt.eval_coeffs();
     rhs = kkt.eval_rhs();

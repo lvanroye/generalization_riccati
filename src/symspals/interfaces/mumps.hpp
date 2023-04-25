@@ -72,10 +72,6 @@ namespace symspals
                        myid, id.infog[0], id.infog[1]);
                 error = 1;
             }
-            // long int memory_size = 10 * id.info[7];
-            // cout << "memory size " << memory_size << endl;
-            // id.lwk_user = memory_size;
-            // id.wk_user = (double*) malloc(memory_size*sizeof(double));
         };
         void set_coefficient_matrix(const vector<double>& A)
         {
@@ -86,12 +82,8 @@ namespace symspals
             MUMPS_INT *jcn = ai.data();
             id.irn = irn;
             id.jcn = jcn;
-            // assert(((int)A.size()) == nnz);
             for (int i = 0; i < nnz; i++)
             {
-                // // check wether right structure
-                // assert(ai.at(i) == A.at(i).row() + 1);
-                // assert(aj.at(i) == A.at(i).col() + 1);
                 a.at(i) = A.at(i);
             }
         }
@@ -104,10 +96,6 @@ namespace symspals
             id.a = a.data();
             id.rhs = rhsvec.data();
 
-            /* Call the MUMPS package (analyse, factorization and solve). */
-            // double el_time = 0.0;
-            // blasfeo_timer timer;
-            // blasfeo_tic(&timer);
             id.job = 2;
             dmumps_c(&id);
             if (id.infog[0] < 0)
@@ -124,10 +112,6 @@ namespace symspals
                        myid, id.infog[0], id.infog[1]);
                 error = 1;
             }
-            // el_time = blasfeo_toc(&timer);
-            // solve_time_total += el_time;
-            // no_solves +=1;
-            // cout << "el time mumps " << el_time << endl;
         }
         ~InterfaceMUMPS()
         {
