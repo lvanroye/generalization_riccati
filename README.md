@@ -6,3 +6,5 @@ This repository contains
 - gen_riccati: a library that implements the generalization of Riccati recursion from the paper, the only dependency here is blasfeo
 
 - the code for performing the benchmark of the paper: here we have a dependency on fatrop for setting up the problems
+
+Known issues: not possible to use ma57 and mumps with metis library at the same time because ma57 

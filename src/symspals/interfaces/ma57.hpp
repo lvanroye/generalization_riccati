@@ -79,6 +79,7 @@ namespace symspals
 
             icntl[3] = 1; /* Print statistics.  NOT Used. */
             icntl[4] = 0; /* Print error. */
+            // icntl[5] = 4; /* Use metis ordering */
 
             // icntl[14] = 0; // turn off automatic scaling
             Analyze();
