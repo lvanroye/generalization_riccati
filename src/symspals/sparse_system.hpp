@@ -4,6 +4,7 @@
 #include "interfaces/sparse_solver_interface.hpp"
 #include "interfaces/mumps.hpp"
 #include "interfaces/ma57.hpp"
+#include "interfaces/pardiso.hpp"
 #include <memory>
 #include <unordered_map>
 #include <algorithm>
@@ -196,6 +197,16 @@ namespace symspals
                 sparsity.push_back(triplet.index);
                 coeffs.push_back(triplet.value);
             }
+            vector<Expression> parameter_sym_vec;
+            for (auto p : parameters_syms)
+            {
+                auto p_vec = vec(*p);
+                parameter_sym_vec.insert(parameter_sym_vec.end(), p_vec.begin(), p_vec.end());
+            }
+
+            // initialize the function that computes the coefficients
+            coeffs_f = Function(parameter_sym_vec, coeffs);
+            rhs_f = Function(parameter_sym_vec, vec(rhss));
             if (linear_solver == "ma57")
             {
                 solver_ptr = make_unique<InterfaceMA57>(var_vec.size(), sparsity);
@@ -208,23 +219,16 @@ namespace symspals
             }
             else if (linear_solver == "pardiso")
             {
-                // solver_ptr = make_unique<InterfacePardiso>(var_vec.size(), sparsity);
-                // solver_ptr->preprocess();
+                // pardiso requires an initial value estimate
+                eval_params();
+                vector<double> initial = coeffs_f.Eval(parameters_vals);
+                solver_ptr = make_unique<InterfacePardiso>(var_vec.size(), sparsity, initial);
+                solver_ptr->preprocess();
             }
             else
             {
                 throw runtime_error("Unknown solver");
             }
-            vector<Expression> parameter_sym_vec;
-            for (auto p : parameters_syms)
-            {
-                auto p_vec = vec(*p);
-                parameter_sym_vec.insert(parameter_sym_vec.end(), p_vec.begin(), p_vec.end());
-            }
-
-            // initialize the function that computes the coefficients
-            coeffs_f = Function(parameter_sym_vec, coeffs);
-            rhs_f = Function(parameter_sym_vec, vec(rhss));
             dirty = false;
         }
         bool dirty = true;

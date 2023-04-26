@@ -28,12 +28,12 @@ int main()
 
     cout << "sparse kkt system" << endl;
     KKTSystem kkt;
-    auto x_kkt = kkt.variable({1}, {3});
+    auto x_kkt = kkt.variable({69}, {3});
     auto y_kkt = kkt.variable({0}, {0});
     auto z_kkt = kkt.variable({2}, {1});
-    kkt.add_constraint(x_kkt + y_kkt + z_kkt, {0});
+    kkt.add_constraint(10*x_kkt + y_kkt + z_kkt, {0});
     kkt.add_constraint(x_kkt + y_kkt, {0});
-    kkt.solver("mumps");
+    kkt.solver("pardiso");
     sps = kkt.get_sparsity();
     coeffs = kkt.eval_coeffs();
     rhs = kkt.eval_rhs();
