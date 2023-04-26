@@ -6,6 +6,8 @@
 #include "interfaces/ma57.hpp"
 #include <memory>
 #include <unordered_map>
+#include <algorithm>
+#include <unordered_set>
 namespace symspals
 {
     class Parameter : public shared_ptr<Matrix<Expression>>
@@ -172,9 +174,23 @@ namespace symspals
             auto eq_vec = vec(equations);
             auto var_vec = vec(variables);
             auto triplets = GetCoefficients(eq_vec, var_vec);
-            // const int n_eq = equations.size();
-            // const int n_var = variables.size();
-            // go trough all triplets
+            // pardiso requires triplets ordered in column major order and explicit zero diagonal entries
+            if (linear_solver == "pardiso")
+            {
+                unordered_set<Index> sparsity_set;
+                for(auto triplet : triplets)
+                {
+                    sparsity_set.insert(triplet.index);
+                }
+                for(size_t i = 0; i < var_vec.size(); i++)
+                {
+                    // check if diagonal entry is present if it's not add zero to triplets
+                    if(sparsity_set.find(Index{(int) i,(int) i}) == sparsity_set.end())
+                        triplets.push_back(Triplet<Expression>(i, i, Const(0)));
+                }
+                sort(triplets.begin(), triplets.end(), [](const Triplet<Expression> &a, const Triplet<Expression> &b)
+                     { return (a.index.col == b.index.col) ? a.index.row < b.index.row : a.index.col < b.index.col; });
+            }
             for (auto triplet : triplets)
             {
                 sparsity.push_back(triplet.index);
@@ -189,6 +205,15 @@ namespace symspals
             {
                 solver_ptr = make_unique<InterfaceMUMPS>(var_vec.size(), sparsity);
                 solver_ptr->preprocess();
+            }
+            else if (linear_solver == "pardiso")
+            {
+                // solver_ptr = make_unique<InterfacePardiso>(var_vec.size(), sparsity);
+                // solver_ptr->preprocess();
+            }
+            else
+            {
+                throw runtime_error("Unknown solver");
             }
             vector<Expression> parameter_sym_vec;
             for (auto p : parameters_syms)
