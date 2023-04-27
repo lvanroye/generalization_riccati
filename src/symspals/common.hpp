@@ -27,12 +27,6 @@ namespace std
         {
             using std::hash;
             using std::size_t;
-            using std::string;
-
-            // Compute individual hash values for first,
-            // second and third and combine them using XOR
-            // and bit shifting:
-
             return (hash<int>()(k.row) ^ (hash<int>()(k.col) << 1));
         }
     };

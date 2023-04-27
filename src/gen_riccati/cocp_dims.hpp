@@ -1,8 +1,7 @@
-#pragma once
-#include "cocp_dims.hpp"
 namespace gen_riccati
 {
-    class COCP
+    class COCPDims
     {
+
     };
 } // namespace gen_riccati
