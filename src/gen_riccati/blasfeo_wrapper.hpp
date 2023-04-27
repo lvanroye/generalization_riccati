@@ -153,7 +153,7 @@ namespace gen_riccati
     {
     public:
         /** \brief constuction for allocation on fatrop_memory_allocator*/
-        FatropMemoryMatBF(const FatropVector<int> &nrows, const FatropVector<int> &ncols, int N);
+        FatropMemoryMatBF(const NumericVector &nrows, const NumericVector &ncols, int N);
         // TODO: if rvalue-reference is used -> unecessary copy, use move sementics instead.;
         FatropMemoryMatBF(const int nrows, const int ncols, int N);
         /** \brief calculate memory size*/
@@ -167,6 +167,11 @@ namespace gen_riccati
         {
             return mat;
         }
+        FatropMemoryMatBF(FatropMemoryMatBF &&cpy) : mem(cpy.mem), mat(cpy.mat), N_(cpy.N_), nrows_(cpy.nrows_), ncols_(cpy.ncols_)
+        {
+            cpy.mem = NULL;
+            cpy.mat = NULL;
+        }
         FatropMemoryMatBF(const FatropMemoryMatBF &cpy) = delete;
         FatropMemoryMatBF &operator=(const FatropMemoryMatBF &) = delete;
         ~FatropMemoryMatBF();
@@ -175,8 +180,8 @@ namespace gen_riccati
         void *mem = NULL;
         MAT *mat;
         const int N_;
-        const FatropVector<int> nrows_;
-        const FatropVector<int> ncols_;
+        const NumericVector nrows_;
+        const NumericVector ncols_;
     };
     /** this class is used for blasfeo vectors*/
     class FatropVecBF : public FatropVec
@@ -199,7 +204,7 @@ namespace gen_riccati
         /** \brief copies all elements from a given fatrop_vector to this vector*/
         void operator=(const FatropVec &fm);
         void copy(const FatropVecBF &fm);
-        void copyto(std::vector<double>& dest) const;
+        void copyto(std::vector<double> &dest) const;
         void operator=(const std::vector<double> &fm);
         /** \brief set data pointer*/
         void set_datap(VEC *vecbf);
@@ -228,7 +233,7 @@ namespace gen_riccati
     {
     public:
         /** \brief constuction for allocation on MemoryAllocator*/
-        FatropMemoryVecBF(const FatropVector<int> &nels, int N);
+        FatropMemoryVecBF(const NumericVector &nels, int N);
         // TODO: if rvalue-reference is used -> unecessary copy, use move sementics instead.;
         FatropMemoryVecBF(const int nels, int N);
         /** \brief calculate memory size*/
@@ -250,7 +255,7 @@ namespace gen_riccati
         void *mem = NULL;
         VEC *vec;
         const int N_;
-        const FatropVector<int> nels_;
+        const NumericVector nels_;
     };
 
     /** \brief this class represents a permutation matrix */

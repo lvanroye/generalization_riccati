@@ -15,6 +15,17 @@ namespace gen_riccati
         }
         return res;
     };
+
+    NumericVector operator+(const NumericVector& a, const int b)
+    {
+        NumericVector res;
+        for (size_t i = 0; i < a.size(); i++)
+        {
+            res.push_back(a[i] + b);
+        }
+        return res;
+    };
+
     NumericVector rotate(const NumericVector &a, const int shift)
     {
         NumericVector res;
