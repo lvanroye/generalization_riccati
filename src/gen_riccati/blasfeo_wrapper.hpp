@@ -81,6 +81,13 @@ extern "C"
 #include <assert.h>
 #endif
 #include "numeric_vector.hpp"
+using namespace std;
+#include <cassert>
+#if DEBUG
+#define DBGASSERT(assertion) assert(assertion);
+#else
+#define DBGASSERT(assertion)
+#endif
 namespace gen_riccati
 {
     void fatrop_dcolsc(int kmax, double alpha, struct blasfeo_dmat *sA, int ai, int aj);
@@ -97,6 +104,33 @@ namespace gen_riccati
     void fatrop_dgead_transposed(int m, int n, double alpha, struct blasfeo_dmat *sA, int offs_ai, int offs_aj, struct blasfeo_dmat *sB, int offs_bi, int offs_bj);
     void fatrop_identity(const int m, MAT *sA, const int ai, const int aj);
     void fatrop_drowad(int kmax, double alpha, struct blasfeo_dvec *sx, int xi, struct blasfeo_dmat *sA, int ai, int aj);
+    struct MatrixInd
+    {
+        int ai;
+        int aj;
+    };
+    /** \brief Interface class for matrix representations */
+    class FatropMat
+    {
+    public:
+        /** \brief Copy of matrix element */
+        virtual double get_el(const int ai, const int aj) const = 0;
+        /** \brief Number of rows */
+        virtual int nrows() const = 0;
+        /** \brief Number of cols */
+        virtual int ncols() const = 0;
+        void print();
+    };
+    /** \brief Interface class for matrix representations */
+    class FatropVec
+    {
+    public:
+        /** \brief Copy of matrix element */
+        virtual double get_el(const int ai) const = 0;
+        /** \brief Number of elements */
+        virtual int nels() const = 0;
+        void print();
+    };
     /** \brief this class is used for blasfeo matrices*/
     class FatropMatBF : public FatropMat
     {

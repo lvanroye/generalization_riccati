@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <algorithm>
 #include <initializer_list>
-#include "common.hpp" 
+#include "common.hpp"
 using namespace std;
 namespace symspals
 {
@@ -308,7 +308,6 @@ namespace symspals
         return terms;
     };
 
-
     template <typename T>
     class TripletVec : public vector<Triplet<T>>
     {
@@ -560,15 +559,16 @@ namespace symspals
     class Matrix
     {
     public:
-        Matrix() : Matrix(0, 0) {};
+        Matrix() : Matrix(0, 0){};
         Matrix(const int n_rows, const int n_cols) : n_rows_(n_rows), n_cols_(n_cols)
         {
             data.resize(n_rows * n_cols, T(0.0));
         };
         Matrix(const T &val) : Matrix(1, 1) { data[0] = val; };
         Matrix(const vector<T> &val) : Matrix(val.size(), 1) { data = val; };
-        Matrix(const initializer_list<T> &val) : Matrix(val.size(), 1) {
-            // copy 
+        Matrix(const initializer_list<T> &val) : Matrix(val.size(), 1)
+        {
+            // copy
             copy(val.begin(), val.end(), data.begin());
         };
         T &operator()(int i, int j) { return data[i + n_rows_ * j]; };
@@ -581,14 +581,36 @@ namespace symspals
         {
             return n_cols_;
         };
+        Matrix<T> block(int i, int j, int n_rows, int n_cols) const
+        {
+            Matrix<T> result(n_rows, n_cols);
+            for (int k = 0; k < n_rows; k++)
+            {
+                for (int l = 0; l < n_cols; l++)
+                {
+                    result(k, l) = (*this)(i + k, j + l);
+                }
+            }
+            return result;
+        };
+        Matrix<T> transpose()
+        {
+            Matrix<T> result(n_cols_, n_rows_);
+            for (int i = 0; i < n_rows_; i++)
+            {
+                for (int j = 0; j < n_cols_; j++)
+                {
+                    result(j, i) = (*this)(i, j);
+                }
+            }
+            return result;
+        }
 
     protected:
         vector<T> data;
         int n_rows_;
         int n_cols_;
     };
-    
-
 
     template <typename T>
     ostream &operator<<(ostream &os, const Matrix<T> &A)
@@ -692,7 +714,6 @@ namespace symspals
         }
         return C;
     }
-
 
     Matrix<Expression> tril(const Matrix<Expression> &A)
     {

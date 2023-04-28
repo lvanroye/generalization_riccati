@@ -4,6 +4,9 @@ namespace gen_riccati
 {
     class NumericVector : public std::vector<int>
     {
+        public:
+        using std::vector<int>::vector;
+        NumericVector(const std::vector<int> & v) : std::vector<int>(v) {};
     };
 
     NumericVector operator+(const NumericVector &a, const NumericVector &b)
