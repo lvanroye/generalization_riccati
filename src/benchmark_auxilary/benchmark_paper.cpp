@@ -14,5 +14,8 @@ int main()
     FatropProblemWrap fatrop_problem_wrap(ocp);
     auto cocp = fatrop_problem_wrap.create_cocp();
     fatrop_problem_wrap.populate_cocp(cocp);
+    BenchmarkSparse benchmark_sparse(cocp);
+    vector<double> sol;
+    benchmark_sparse.kkt_system_.solve(sol);
     return 0;
 }

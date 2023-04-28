@@ -520,6 +520,7 @@ namespace symspals
         {
             vector<double> result(output_size);
             work.resize(0);
+            work.reserve(algorithm.size());
             for (auto el : algorithm)
             {
                 switch (el.ins)

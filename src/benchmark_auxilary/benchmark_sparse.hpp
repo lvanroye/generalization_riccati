@@ -27,7 +27,6 @@ namespace genriccati_benchmark
             {
                 RSQ_blocks.push_back(kkt_system_.parameter(nu[k] + nx[k], nu[k] + nx[k]));
                 rq_grads.push_back(kkt_system_.parameter(nu[k] + nx[k], 1));
-                rq_grads.push_back(kkt_system_.parameter(nu[k] + nx[k], nu[k] + nx[k]));
                 ux_syms.push_back(kkt_system_.variable(RSQ_blocks[k], rq_grads[k]));
             }
             // add dynamics constraints
@@ -35,14 +34,14 @@ namespace genriccati_benchmark
             {
                 BA_blocks.push_back(kkt_system_.parameter(nx[k + 1], nu[k] + nx[k]));
                 b_rhss.push_back(kkt_system_.parameter(nx[k + 1], 1));
-                kkt_system_.add_constraint(-ux_syms[k + 1].block(nu[k + 1], 0, nx[k + 1], 1) + (*BA_blocks[k]) * ux_syms[k], b_rhss[k]);
+                kkt_system_.add_constraint(-ux_syms[k + 1].block(nu[k + 1], 0, nx[k + 1], 1) + (*BA_blocks[k]) * ux_syms[k], -b_rhss[k]);
             }
             // add the stagewise constraints
             for (int k = 0; k < K; k++)
             {
                 G_blocks.push_back(kkt_system_.parameter(ng[k], nu[k] + nx[k]));
                 g_rhss.push_back(kkt_system_.parameter(ng[k], 1));
-                kkt_system_.add_constraint((*G_blocks[k]) * ux_syms[k], g_rhss[k]);
+                kkt_system_.add_constraint((*G_blocks[k]) * ux_syms[k], -g_rhss[k]);
             }
             set_value(cocp);
         }
