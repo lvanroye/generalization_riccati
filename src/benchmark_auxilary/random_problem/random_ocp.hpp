@@ -83,7 +83,7 @@ namespace genriccati_benchmark
             MAT *res,
             const int k) override
         {
-            random_matrix(nu + nx + 1, nu + nx, res, 0, 0);
+            random_matrix(nu + nx + 1, nx, res, 0, 0);
             return 0;
         };
         int eval_RSQrqtk(
@@ -238,10 +238,10 @@ namespace genriccati_benchmark
             // multiply B with its transpose and save to A, naive implementation
             for (int i = 0; i < n; i++)
             {
-                for (int j = 0; j <= i; j++)
+                for (int j = 0; j < n; j++)
                 {
                     double sum = 0.0;
-                    for (int k = 0; k < n; k++)
+                    for (int k = 0; k <=i; k++)
                     {
                         sum += MATEL(&B, i, k) * MATEL(&B, j, k);
                     }
