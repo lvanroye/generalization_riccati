@@ -11,6 +11,7 @@
 #include <set>
 #include <initializer_list>
 #include "common.hpp"
+#include <unordered_map>
 using namespace std;
 namespace symspals
 {
@@ -22,6 +23,7 @@ namespace symspals
     public:
         virtual ostream &print(ostream &os) { return os << "Node"; };
         virtual bool equals(const Node &node) const { return this == &node; };
+        bool operator==(const Node &node) const { return equals(node); };
         virtual bool is_sym() const { return false; };
         virtual bool is_const() const { return false; };
         virtual bool is_zero() const { return false; };
@@ -56,7 +58,6 @@ namespace symspals
         friend ostream &operator<<(ostream &os, const Expression &expr) { return expr->print(os); };
         // bool operator==(const Expression &expr) const { return this->get()->equals(*expr.get()); };
     };
-
     class LeafNode : public Node
     {
         bool is_leaf() const override { return true; };
@@ -338,7 +339,6 @@ namespace symspals
         TripletVec<Expression> ret;
     };
 
-
     TripletVec<Expression> GetCoefficients_old(const vector<Expression> &expr_vec, const vector<Expression> &sym_vec)
     {
         TripletVec<Expression> ret;
@@ -387,24 +387,14 @@ namespace symspals
         }
         return ret;
     };
-
-    void OrderDepthFirstRecurse(const Expression expr, vector<Expression> &result)
+    struct Expression_hash
     {
-        // // check if expr is already in result
-        if (find(result.begin(), result.end(), expr) != result.end())
+        size_t operator()(const Expression &expr) const
         {
-            return;
+            return hash<shared_ptr<Node>>()(expr);
         }
-        // check if expression is a binary
-        if (expr->is_binary())
-        {
-            auto expr1 = expr->dep(0);
-            auto expr2 = expr->dep(1);
-            OrderDepthFirstRecurse(expr1, result);
-            OrderDepthFirstRecurse(expr2, result);
-        }
-        result.push_back(expr);
     };
+
     class Function
     {
         // the set of possible instructions is very limited
@@ -425,13 +415,35 @@ namespace symspals
         };
 
     public:
+        vector<Expression> ordered_expression;
+        unordered_map<Expression, int, Expression_hash> expr_to_index;
+        void OrderDepthFirstRecurse(const Expression &expr)
+        {
+            // check if expression is already in the set
+            if (expr_to_index.find(expr) != expr_to_index.end())
+            {
+                return;
+            }
+            // check if expression is a binary
+            if (expr->is_binary())
+            {
+                auto expr1 = expr->dep(0);
+                auto expr2 = expr->dep(1);
+                OrderDepthFirstRecurse(expr1);
+                OrderDepthFirstRecurse(expr2);
+            }
+            expr_to_index[expr] = ordered_expression.size();
+            ordered_expression.push_back(expr);
+        };
         Function(){};
         Function(const vector<Expression> &input, const vector<Expression> &output)
         {
             // TODO: at this point no re-use of workspace is done, the lifetime of workspace variables is not taken into account
-            vector<Expression> ordered_expression;
+            // vector<Expression> ordered_expression;
+            cout << "depth first order" << endl;
             for (auto expr : output)
-                OrderDepthFirstRecurse(expr, ordered_expression);
+                OrderDepthFirstRecurse(expr);
+            cout << "done dfs" << endl;
             algorithm.reserve(ordered_expression.size());
             work.reserve(ordered_expression.size());
             for (auto expr : ordered_expression)
@@ -449,6 +461,7 @@ namespace symspals
                     }
                     // convert it find output to index
                     int index = it - input.begin();
+                    // int index = expr_to_index[expr];
                     AlgEl el({INPUT, index, 0, 0.0});
                     algorithm.push_back(el);
                 }
@@ -468,26 +481,28 @@ namespace symspals
                 else if (expr->is_binary())
                 {
                     // find the index of expr1 in ordered_expression
-                    auto it = find(ordered_expression.begin(), ordered_expression.end(), expr->dep(0));
+                    // auto it = find(ordered_expression.begin(), ordered_expression.end(), expr->dep(0));
 
-                    // check if expr1 is in ordered_expression
-                    if (it >= ordered_expression.end())
-                    {
-                        // runtime error
-                        throw runtime_error("Error in Function constructor");
-                    }
+                    // // check if expr1 is in ordered_expression
+                    // if (it >= ordered_expression.end())
+                    // {
+                    //     // runtime error
+                    //     throw runtime_error("Error in Function constructor");
+                    // }
                     // convert it find output to index
-                    int index1 = it - ordered_expression.begin();
-                    // find the index of expr2 in ordered_expression
-                    it = find(ordered_expression.begin(), ordered_expression.end(), expr->dep(1));
-                    // check if expr2 is in ordered_expression
-                    if (it >= ordered_expression.end())
-                    {
-                        // runtime error
-                        throw runtime_error("Error in Function constructor");
-                    }
-                    // convert it find output to index
-                    int index2 = it - ordered_expression.begin();
+                    // int index1 = it - ordered_expression.begin();
+                    int index1 = expr_to_index[expr->dep(0)];
+                    // // find the index of expr2 in ordered_expression
+                    // it = find(ordered_expression.begin(), ordered_expression.end(), expr->dep(1));
+                    // // check if expr2 is in ordered_expression
+                    // if (it >= ordered_expression.end())
+                    // {
+                    //     // runtime error
+                    //     throw runtime_error("Error in Function constructor");
+                    // }
+                    // // convert it find output to index
+                    // int index2 = it - ordered_expression.begin();
+                    int index2 = expr_to_index[expr->dep(1)];
                     if (expr->is_mult())
                     {
                         AlgEl el({MULT, index1, index2, 0.0});
@@ -514,10 +529,11 @@ namespace symspals
             for (auto expr : output)
             {
                 // find the index of expr in ordered_expression
-                auto it = find(ordered_expression.begin(), ordered_expression.end(), expr);
-                if (it == ordered_expression.end())
-                    throw runtime_error("error in Function constructor");
-                int index = it - ordered_expression.begin();
+                // auto it = find(ordered_expression.begin(), ordered_expression.end(), expr);
+                // if (it == ordered_expression.end())
+                //     throw runtime_error("error in Function constructor");
+                // int index = it - ordered_expression.begin();
+                int index = expr_to_index[expr];
                 // find the index of expr in output
                 auto it2 = find(output.begin(), output.end(), expr);
                 if (it2 == output.end())
@@ -615,9 +631,12 @@ namespace symspals
         vector<Expression> conc = sym_vec;
         conc.insert(conc.end(), parametric_vec.begin(), parametric_vec.end());
         // make a Function which maps sym_vec into expr_vec
+        cout << "making function" << endl;
         auto func = Function(conc, expr_vec);
+        cout << "done making function" << endl;
         for (size_t i = 0; i < sym_vec.size(); i++)
         {
+            cout << "i = " << i << endl;
             auto fwd = func.forward_sensitivity(sym_vec.at(i), conc);
             for (size_t j = 0; j < fwd.size(); j++)
             {
