@@ -438,8 +438,17 @@ namespace symspals
         Function(){};
         Function(const vector<Expression> &input, const vector<Expression> &output)
         {
-            // TODO: at this point no re-use of workspace is done, the lifetime of workspace variables is not taken into account
-            // vector<Expression> ordered_expression;
+
+            unordered_map<Expression, int, Expression_hash> input_to_index;
+            unordered_map<Expression, int, Expression_hash> output_to_index;
+            for (size_t i = 0; i < input.size(); i++)
+            {
+                input_to_index[input.at(i)] = i;
+            }
+            for (size_t i = 0; i < output.size(); i++)
+            {
+                output_to_index[output.at(i)] = i;
+            }
             cout << "depth first order" << endl;
             for (auto expr : output)
                 OrderDepthFirstRecurse(expr);
@@ -451,17 +460,7 @@ namespace symspals
                 // check if expr is a Sym
                 if (expr->is_sym())
                 {
-                    // find the index of expr in input
-                    auto it = find(input.begin(), input.end(), expr);
-                    // check if expr is in input
-                    if (it >= input.end())
-                    {
-                        // runtime error
-                        throw runtime_error("Error in Function constructor");
-                    }
-                    // convert it find output to index
-                    int index = it - input.begin();
-                    // int index = expr_to_index[expr];
+                    int index = input_to_index[expr];
                     AlgEl el({INPUT, index, 0, 0.0});
                     algorithm.push_back(el);
                 }
@@ -480,28 +479,7 @@ namespace symspals
                 // check if expr is a BinaryNode
                 else if (expr->is_binary())
                 {
-                    // find the index of expr1 in ordered_expression
-                    // auto it = find(ordered_expression.begin(), ordered_expression.end(), expr->dep(0));
-
-                    // // check if expr1 is in ordered_expression
-                    // if (it >= ordered_expression.end())
-                    // {
-                    //     // runtime error
-                    //     throw runtime_error("Error in Function constructor");
-                    // }
-                    // convert it find output to index
-                    // int index1 = it - ordered_expression.begin();
                     int index1 = expr_to_index[expr->dep(0)];
-                    // // find the index of expr2 in ordered_expression
-                    // it = find(ordered_expression.begin(), ordered_expression.end(), expr->dep(1));
-                    // // check if expr2 is in ordered_expression
-                    // if (it >= ordered_expression.end())
-                    // {
-                    //     // runtime error
-                    //     throw runtime_error("Error in Function constructor");
-                    // }
-                    // // convert it find output to index
-                    // int index2 = it - ordered_expression.begin();
                     int index2 = expr_to_index[expr->dep(1)];
                     if (expr->is_mult())
                     {
@@ -528,17 +506,8 @@ namespace symspals
             // add the output instruction
             for (auto expr : output)
             {
-                // find the index of expr in ordered_expression
-                // auto it = find(ordered_expression.begin(), ordered_expression.end(), expr);
-                // if (it == ordered_expression.end())
-                //     throw runtime_error("error in Function constructor");
-                // int index = it - ordered_expression.begin();
                 int index = expr_to_index[expr];
-                // find the index of expr in output
-                auto it2 = find(output.begin(), output.end(), expr);
-                if (it2 == output.end())
-                    throw runtime_error("error in Function constructor");
-                int index2 = it2 - output.begin();
+                int index2 = output_to_index[expr];
                 AlgEl el({OUTPUT, index, index2, 0.0});
                 algorithm.push_back(el);
             }
