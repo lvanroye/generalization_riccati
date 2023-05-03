@@ -67,6 +67,13 @@ namespace genriccati_benchmark
             return gen_riccati::COCP(K, nu, nx, ng);
         }
 
+        void controle()
+        {
+            fatropalg_->solve_pd_sys(0.0, 0.0, 0.0);
+            // ux0
+            fatropalg_->fatropdata_->delta_x.block(0, 10).print();
+        }
+
     private:
         void least_squares_dual()
         {

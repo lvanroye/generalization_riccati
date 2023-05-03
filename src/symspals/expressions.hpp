@@ -7,6 +7,8 @@
 #include <vector>
 #include <type_traits>
 #include <algorithm>
+#include <stack>
+#include <set>
 #include <initializer_list>
 #include "common.hpp"
 using namespace std;
@@ -325,8 +327,19 @@ namespace symspals
             return this->back().value;
         }
     };
+    class CoefficientsHelper
+    {
+        void solve(int eq_number, const Expression &expr, const Expression &curr_coeff)
+        {
+        }
+        set<Expression> sym_set;
+        set<Expression> parametrics;
+        set<Expression> visited_nodes;
+        TripletVec<Expression> ret;
+    };
 
-    TripletVec<Expression> GetCoefficients(const vector<Expression> &expr_vec, const vector<Expression> &sym_vec)
+
+    TripletVec<Expression> GetCoefficients_old(const vector<Expression> &expr_vec, const vector<Expression> &sym_vec)
     {
         TripletVec<Expression> ret;
         for (size_t i = 0; i < expr_vec.size(); i++)
@@ -378,10 +391,10 @@ namespace symspals
     void OrderDepthFirstRecurse(const Expression expr, vector<Expression> &result)
     {
         // // check if expr is already in result
-        // if (find(result.begin(), result.end(), expr) != result.end())
-        // {
-        //     return;
-        // }
+        if (find(result.begin(), result.end(), expr) != result.end())
+        {
+            return;
+        }
         // check if expression is a binary
         if (expr->is_binary())
         {
@@ -549,11 +562,74 @@ namespace symspals
             }
             return result;
         }
+        vector<Expression> forward_sensitivity(const Expression sym_i, const vector<Expression> &input_syms)
+        {
+            vector<Expression> result(output_size);
+            work_e.resize(0);
+            work_e.reserve(algorithm.size());
+            work_e_sense.resize(0);
+            work_e_sense.reserve(algorithm.size());
+            for (auto el : algorithm)
+            {
+                switch (el.ins)
+                {
+                case INPUT:
+                    work_e.push_back(input_syms.at(el.arg1));
+                    // if the input is the sym, then the sensitivity is 1 else 0
+                    work_e_sense.push_back(input_syms[el.arg1] == sym_i ? 1.0 : 0.0);
+                    break;
+                case OUTPUT:
+                    work_e.push_back(0.0);
+                    work_e_sense.push_back(0.0);
+                    result.at(el.arg2) = work_e_sense.at(el.arg1);
+                    break;
+                case PLUS:
+                    work_e.push_back(work_e.at(el.arg1) + work_e.at(el.arg2));
+                    work_e_sense.push_back(work_e_sense.at(el.arg1) + work_e_sense.at(el.arg2));
+                    break;
+                case MULT:
+                    work_e.push_back(work_e.at(el.arg1) * work_e.at(el.arg2));
+                    work_e_sense.push_back(work_e.at(el.arg1) * work_e_sense.at(el.arg2) + work_e_sense.at(el.arg1) * work_e.at(el.arg2));
+                    break;
+                case CONST:
+                    work_e.push_back(el.val);
+                    work_e_sense.push_back(0.0);
+                    break;
+                default:
+                    // runtime error
+                    throw runtime_error("Error in Function Eval");
+                    break;
+                }
+            }
+            return result;
+        }
         vector<AlgEl> algorithm;
         vector<double> work;
         vector<Expression> work_e;
+        vector<Expression> work_e_sense;
         int output_size;
     };
+    TripletVec<Expression> GetCoefficients(const vector<Expression> &expr_vec, const vector<Expression> &sym_vec, const vector<Expression> &parametric_vec)
+    {
+        TripletVec<Expression> ret;
+        vector<Expression> conc = sym_vec;
+        conc.insert(conc.end(), parametric_vec.begin(), parametric_vec.end());
+        // make a Function which maps sym_vec into expr_vec
+        auto func = Function(conc, expr_vec);
+        for (size_t i = 0; i < sym_vec.size(); i++)
+        {
+            auto fwd = func.forward_sensitivity(sym_vec.at(i), conc);
+            for (size_t j = 0; j < fwd.size(); j++)
+            {
+                if (fwd[j]->is_zero())
+                {
+                    continue;
+                }
+                ret.push_back(Triplet<Expression>(i, j, fwd[j]));
+            }
+        }
+        return ret;
+    }
 
     // matrix stuff
     template <typename T>

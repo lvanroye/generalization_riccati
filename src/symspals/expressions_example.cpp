@@ -15,7 +15,7 @@ int main()
     cout << "terms: "<< endl;
     for (auto term : terms)
         cout << term << endl;
-    auto coeffs = GetCoefficients({expr}, {x, y});
+    auto coeffs = GetCoefficients({expr}, {x, y}, {a, b});
     // coefficients
     cout << "coefficients: "<< endl;
     for (auto coeff : coeffs)

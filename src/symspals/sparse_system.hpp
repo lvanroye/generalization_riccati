@@ -174,7 +174,16 @@ namespace symspals
             // coeffs.resize(0);
             auto eq_vec = vec(equations);
             auto var_vec = vec(variables);
-            auto triplets = GetCoefficients(eq_vec, var_vec);
+            vector<Expression> parameter_sym_vec;
+            for (auto p : parameters_syms)
+            {
+                auto p_vec = vec(*p);
+                parameter_sym_vec.insert(parameter_sym_vec.end(), p_vec.begin(), p_vec.end());
+            }
+
+            cout<< "getting coeffs " << endl;
+            auto triplets = GetCoefficients(eq_vec, var_vec, parameter_sym_vec);
+            cout << "got coeffs " << endl;
             // pardiso requires triplets ordered in column major order and explicit zero diagonal entries
             if (linear_solver == "pardiso")
             {
@@ -196,12 +205,6 @@ namespace symspals
             {
                 sparsity.push_back(triplet.index);
                 coeffs.push_back(triplet.value);
-            }
-            vector<Expression> parameter_sym_vec;
-            for (auto p : parameters_syms)
-            {
-                auto p_vec = vec(*p);
-                parameter_sym_vec.insert(parameter_sym_vec.end(), p_vec.begin(), p_vec.end());
             }
 
             // initialize the function that computes the coefficients
