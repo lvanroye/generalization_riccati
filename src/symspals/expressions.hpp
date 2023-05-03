@@ -12,6 +12,7 @@
 #include <initializer_list>
 #include "common.hpp"
 #include <unordered_map>
+#include <queue>
 using namespace std;
 namespace symspals
 {
@@ -453,8 +454,9 @@ namespace symspals
             for (auto expr : output)
                 OrderDepthFirstRecurse(expr);
             cout << "done dfs" << endl;
-            algorithm.reserve(ordered_expression.size());
+            algorithm.reserve(ordered_expression.size() + output.size());
             work.reserve(ordered_expression.size());
+            work_e.reserve(ordered_expression.size());
             for (auto expr : ordered_expression)
             {
                 // check if expr is a Sym
@@ -463,18 +465,21 @@ namespace symspals
                     int index = input_to_index[expr];
                     AlgEl el({INPUT, index, 0, 0.0});
                     algorithm.push_back(el);
+                    work_e.push_back(expr);
                 }
                 // check if expr is a Const
                 else if (expr->is_const())
                 {
                     AlgEl el({CONST, 0, 0, expr->value()});
                     algorithm.push_back(el);
+                    work_e.push_back(expr);
                 }
                 // check if expr is a Zero
                 else if (expr->is_zero())
                 {
                     AlgEl el({CONST, 0, 0, 0.0});
                     algorithm.push_back(el);
+                    work_e.push_back(expr);
                 }
                 // check if expr is a BinaryNode
                 else if (expr->is_binary())
@@ -485,11 +490,13 @@ namespace symspals
                     {
                         AlgEl el({MULT, index1, index2, 0.0});
                         algorithm.push_back(el);
+                        work_e.push_back(expr);
                     }
                     else if (expr->is_plus())
                     {
                         AlgEl el({PLUS, index1, index2, 0.0});
                         algorithm.push_back(el);
+                        work_e.push_back(expr);
                     }
                     else
                     {
@@ -510,6 +517,7 @@ namespace symspals
                 int index2 = output_to_index[expr];
                 AlgEl el({OUTPUT, index, index2, 0.0});
                 algorithm.push_back(el);
+                work_e.push_back(expr);
             }
             output_size = output.size();
         }
@@ -549,36 +557,38 @@ namespace symspals
         }
         vector<Expression> forward_sensitivity(const Expression sym_i, const vector<Expression> &input_syms)
         {
-            vector<Expression> result(output_size);
-            work_e.resize(0);
-            work_e.reserve(algorithm.size());
-            work_e_sense.resize(0);
-            work_e_sense.reserve(algorithm.size());
-            for (auto el : algorithm)
+            vector<Expression> result(output_size, 0.0);
+            // work_e.resize(0);
+            // work_e.reserve(algorithm.size());
+            // work_e_sense.resize(0);
+            work_e_sense.resize(algorithm.size(), 0.0);
+            // for (auto el : algorithm)
+            for (size_t i = 0; i < algorithm.size(); i++)
             {
+                auto el = algorithm.at(i);
                 switch (el.ins)
                 {
                 case INPUT:
-                    work_e.push_back(input_syms.at(el.arg1));
+                    // work_e.push_back(input_syms.at(el.arg1));
                     // if the input is the sym, then the sensitivity is 1 else 0
-                    work_e_sense.push_back(input_syms[el.arg1] == sym_i ? 1.0 : 0.0);
+                    work_e_sense[i] = input_syms[el.arg1] == sym_i ? 1.0 : 0.0;
                     break;
                 case OUTPUT:
-                    work_e.push_back(0.0);
-                    work_e_sense.push_back(0.0);
+                    // work_e.push_back(0.0);
+                    work_e_sense[i] = 0.0;
                     result.at(el.arg2) = work_e_sense.at(el.arg1);
                     break;
                 case PLUS:
-                    work_e.push_back(work_e.at(el.arg1) + work_e.at(el.arg2));
-                    work_e_sense.push_back(work_e_sense.at(el.arg1) + work_e_sense.at(el.arg2));
+                    // work_e.push_back(work_e.at(el.arg1) + work_e.at(el.arg2));
+                    work_e_sense[i] = (work_e_sense.at(el.arg1) + work_e_sense.at(el.arg2));
                     break;
                 case MULT:
-                    work_e.push_back(work_e.at(el.arg1) * work_e.at(el.arg2));
-                    work_e_sense.push_back(work_e.at(el.arg1) * work_e_sense.at(el.arg2) + work_e_sense.at(el.arg1) * work_e.at(el.arg2));
+                    // work_e.push_back(work_e.at(el.arg1) * work_e.at(el.arg2));
+                    work_e_sense[i] = (work_e.at(el.arg1) * work_e_sense.at(el.arg2) + work_e_sense.at(el.arg1) * work_e.at(el.arg2));
                     break;
                 case CONST:
-                    work_e.push_back(el.val);
-                    work_e_sense.push_back(0.0);
+                    // work_e.push_back(el.val);
+                    work_e_sense[i] = (0.0);
                     break;
                 default:
                     // runtime error
@@ -594,6 +604,7 @@ namespace symspals
         vector<Expression> work_e_sense;
         int output_size;
     };
+
     TripletVec<Expression> GetCoefficients(const vector<Expression> &expr_vec, const vector<Expression> &sym_vec, const vector<Expression> &parametric_vec)
     {
         TripletVec<Expression> ret;
