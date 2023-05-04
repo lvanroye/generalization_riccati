@@ -450,10 +450,10 @@ namespace symspals
             {
                 output_to_index[output.at(i)] = i;
             }
-            cout << "depth first order" << endl;
+            // cout << "depth first order" << endl;
             for (auto expr : output)
                 OrderDepthFirstRecurse(expr);
-            cout << "done dfs" << endl;
+            // cout << "done dfs" << endl;
             algorithm.reserve(ordered_expression.size());
             work.reserve(ordered_expression.size());
             work_e.reserve(ordered_expression.size());
@@ -511,10 +511,10 @@ namespace symspals
                 }
             }
             // add the output instruction
-            for(int i = 0; i < output.size(); i++)
+            for(size_t i = 0; i < output.size(); i++)
             {
                 int index = expr_to_index.at(output.at(i));
-                AlgEl el({OUTPUT, index, i, 0.0});
+                AlgEl el({OUTPUT, index, (int) i, 0.0});
                 algorithm.push_back(el);
                 work_e.push_back(output.at(i));
             }
@@ -663,10 +663,10 @@ namespace symspals
         TripletVec<Expression> operator ()(const vector<Expression> &expr, const vector<Expression> &sym_vec)
         {
             TripletVec<Expression> ret;
-            for(int i =0; i<sym_vec.size(); i++){
+            for(size_t i =0; i<sym_vec.size(); i++){
                 sym_to_index[sym_vec[i]] = i;
             }
-            for (int i = 0; i < expr.size(); i++)
+            for(size_t i = 0; i < expr.size(); i++)
             {
                 solve(expr[i], i, ret);
             }
@@ -681,12 +681,12 @@ namespace symspals
         vector<Expression> conc = sym_vec;
         conc.insert(conc.end(), parametric_vec.begin(), parametric_vec.end());
         // make a Function which maps sym_vec into expr_vec
-        cout << "making function" << endl;
+        // cout << "making function" << endl;
         auto func = Function(conc, expr_vec);
-        cout << "done making function" << endl;
+        // cout << "done making function" << endl;
         for (size_t i = 0; i < sym_vec.size(); i++)
         {
-            cout << "i = " << i << endl;
+            // cout << "i = " << i << endl;
             auto fwd = func.forward_sensitivity(sym_vec.at(i), conc);
             for (size_t j = 0; j < fwd.size(); j++)
             {

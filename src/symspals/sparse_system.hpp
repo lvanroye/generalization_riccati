@@ -159,6 +159,19 @@ namespace symspals
                     res[col] += coeffs_vals[i] * sol[row];
             }
         }
+        void numeric_prune()
+        {
+            make_clean(true);
+        }
+        void print_coeff_values()
+        {
+            eval_params();
+            auto coeffs = coeffs_f.Eval(parameters_vals);
+            for(size_t i = 0; i < coeffs.size(); i++)
+            {
+                cout << "coeffs[" << sparsity[i].row << ", " << sparsity[i].col << "] = " << coeffs[i] << endl;
+            }
+        }
         vector<Matrix<Expression>> variables;
         vector<Parameter> parameters_syms;
         unordered_map<shared_ptr<Matrix<Expression>>, Matrix<double>> parameters;
@@ -173,7 +186,7 @@ namespace symspals
         unique_ptr<SparseSolverInterface> solver_ptr;
 
     private:
-        void make_clean()
+        void make_clean(bool prune = false)
         {
             sparsity.resize(0);
             coeffs.resize(0);
@@ -218,15 +231,29 @@ namespace symspals
                 sparsity.push_back(triplet.index);
                 coeffs.push_back(triplet.value);
             }
-            // // print sparsity and coeffs
-            // for (size_t i = 0; i < sparsity.size(); i++)
-            // {
-            //     cout << sparsity[i].row << " " << sparsity[i].col << " " << coeffs[i] << endl;
-            // }
-
             // initialize the function that computes the coefficients
             coeffs_f = Function(parameter_sym_vec, coeffs);
             rhs_f = Function(parameter_sym_vec, vec(rhss));
+            if(prune)
+            {
+                eval_params();
+                auto coeff_vals = coeffs_f.Eval(parameters_vals);
+                // prune sparsity based on numerical values
+                vector<Index> new_sparsity;
+                vector<Expression> new_coeffs;
+                for(size_t i = 0; i < sparsity.size(); i++)
+                {
+                    if(coeff_vals[i] != 0)
+                    {
+                        new_sparsity.push_back(sparsity[i]);
+                        new_coeffs.push_back(coeffs[i]);
+                    }
+                }
+                sparsity = new_sparsity;
+                coeffs = new_coeffs;
+                coeffs_f = Function(parameter_sym_vec, coeffs);
+                rhs_f = Function(parameter_sym_vec, vec(rhss));
+            }
             if (linear_solver == "ma57")
             {
                 solver_ptr = make_unique<InterfaceMA57>(var_vec.size(), sparsity);

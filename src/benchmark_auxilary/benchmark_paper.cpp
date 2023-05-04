@@ -16,13 +16,16 @@ int main()
     fatrop_problem_wrap.populate_cocp(cocp);
     BenchmarkSparse benchmark_sparse(cocp);
     vector<double> sol;
-    cout << "solve 1" << endl;
+    // cout << "solve 1" << endl;
+    benchmark_sparse.kkt_system_.numeric_prune();
+    benchmark_sparse.kkt_system_.print_coeff_values();
+
     benchmark_sparse.kkt_system_.solve(sol);
     fatrop_problem_wrap.controle();
     auto ux0 = benchmark_sparse.kkt_system_.evaluator(benchmark_sparse.ux_syms[0]).Eval(sol);
     // print ux0 with for loop
     cout << "ux0 = [";
-    for (int i = 0; i < ux0.size(); i++)
+    for (size_t i = 0; i < ux0.size(); i++)
     {
         cout << ux0[i] << " ";
     }
