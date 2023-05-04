@@ -78,7 +78,12 @@ namespace symspals
             if (dirty)
                 make_clean();
             eval_params();
-            return coeffs_f.Eval(parameters_vals);
+            auto ret = coeffs_f.Eval(parameters_vals);
+            // for (int i = 0; i < coeffs.size(); i++)
+            // {
+            //     cout << "coeffs[" << sparsity[i].row << ", " << sparsity[i].col << "] = " << ret[i] << endl;
+            // }
+            return ret;
         }
         vector<double> eval_rhs()
         {
@@ -121,8 +126,9 @@ namespace symspals
         {
             if (dirty)
                 make_clean();
-            eval_params();
-            solver_ptr->set_coefficient_matrix(coeffs_f.Eval(parameters_vals));
+            // eval_params();
+            // solver_ptr->set_coefficient_matrix(coeffs_f.Eval(parameters_vals));
+            solver_ptr->set_coefficient_matrix(eval_coeffs());
             solution = rhs_f.Eval(parameters_vals);
             solver_ptr->solve(solution);
         }
@@ -163,7 +169,7 @@ namespace symspals
         vector<Expression> coeffs;
         Function coeffs_f; // computes coefficients from parameters
         Function rhs_f;
-        string linear_solver = "ma57";
+        string linear_solver = "mumps";
         unique_ptr<SparseSolverInterface> solver_ptr;
 
     private:
@@ -181,22 +187,28 @@ namespace symspals
                 parameter_sym_vec.insert(parameter_sym_vec.end(), p_vec.begin(), p_vec.end());
             }
 
-            cout<< "getting coeffs " << endl;
-            auto triplets = GetCoefficients(eq_vec, var_vec, parameter_sym_vec);
-            cout << "got coeffs " << endl;
+            // cout << "getting coeffs " << endl;
+            // auto triplets = GetCoefficients(eq_vec, var_vec, parameter_sym_vec);
+            auto triplets = CoefficientSimple()(eq_vec, var_vec);
+            // print tiplets
+            // cout << "got coeffs " << endl;
             // pardiso requires triplets ordered in column major order and explicit zero diagonal entries
-            if (linear_solver == "pardiso")
+            // if (linear_solver == "pardiso")
+            if (true)
             {
                 unordered_set<Index> sparsity_set;
-                for(auto triplet : triplets)
+                for (auto triplet : triplets)
                 {
                     sparsity_set.insert(triplet.index);
                 }
-                for(size_t i = 0; i < var_vec.size(); i++)
+                if (linear_solver == "pardiso")
                 {
-                    // check if diagonal entry is present if it's not add zero to triplets
-                    if(sparsity_set.find(Index{(int) i,(int) i}) == sparsity_set.end())
-                        triplets.push_back(Triplet<Expression>(i, i, Const(0)));
+                    for (size_t i = 0; i < var_vec.size(); i++)
+                    {
+                        // check if diagonal entry is present if it's not add zero to triplets
+                        if (sparsity_set.find(Index{(int)i, (int)i}) == sparsity_set.end())
+                            triplets.push_back(Triplet<Expression>(i, i, Const(0)));
+                    }
                 }
                 sort(triplets.begin(), triplets.end(), [](const Triplet<Expression> &a, const Triplet<Expression> &b)
                      { return (a.index.col == b.index.col) ? a.index.row < b.index.row : a.index.col < b.index.col; });
@@ -206,6 +218,11 @@ namespace symspals
                 sparsity.push_back(triplet.index);
                 coeffs.push_back(triplet.value);
             }
+            // // print sparsity and coeffs
+            // for (size_t i = 0; i < sparsity.size(); i++)
+            // {
+            //     cout << sparsity[i].row << " " << sparsity[i].col << " " << coeffs[i] << endl;
+            // }
 
             // initialize the function that computes the coefficients
             coeffs_f = Function(parameter_sym_vec, coeffs);
