@@ -8,7 +8,7 @@ using namespace std;
 int main()
 {
     // create a random OCP
-    shared_ptr<OCPAbstract> ocp = make_shared<RandomOCP>(100, 50, 25, 50, 0, 0);
+    shared_ptr<OCPAbstract> ocp = make_shared<RandomOCP>(10, 2, 2, 2, 0, 0);
     // creat a cart pendulum OCP
     // shared_ptr<OCPAbstract> ocp = make_shared<StageOCP>(CartPendulumProblem());
     FatropProblemWrap fatrop_problem_wrap(ocp);
@@ -17,8 +17,6 @@ int main()
     BenchmarkSparse benchmark_sparse(cocp);
     vector<double> sol;
     cout << "solve 1" << endl;
-    benchmark_sparse.kkt_system_.solve(sol);
-    cout << "solve 2" << endl;
     benchmark_sparse.kkt_system_.solve(sol);
     fatrop_problem_wrap.controle();
     auto ux0 = benchmark_sparse.kkt_system_.evaluator(benchmark_sparse.ux_syms[0]).Eval(sol);

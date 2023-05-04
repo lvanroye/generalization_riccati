@@ -11,8 +11,8 @@ int main()
     auto y_kkt = kkt.variable({0}, {0});
     auto z_kkt = kkt.variable({2}, {1});
     auto p = kkt.parameter(1, 1);
-    kkt.add_constraint(10*x_kkt + y_kkt + (*p)*z_kkt, {0});
-    kkt.add_constraint(x_kkt + y_kkt, {0});
+    kkt.add_constraint(- y_kkt + 10*x_kkt  + (*p)*z_kkt, {0});
+    kkt.add_constraint(-x_kkt + y_kkt, {0});
     /* 
     choose a solver
     */

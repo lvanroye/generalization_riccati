@@ -454,7 +454,7 @@ namespace symspals
             for (auto expr : output)
                 OrderDepthFirstRecurse(expr);
             cout << "done dfs" << endl;
-            algorithm.reserve(ordered_expression.size() + output.size());
+            algorithm.reserve(ordered_expression.size());
             work.reserve(ordered_expression.size());
             work_e.reserve(ordered_expression.size());
             for (auto expr : ordered_expression)
@@ -462,7 +462,7 @@ namespace symspals
                 // check if expr is a Sym
                 if (expr->is_sym())
                 {
-                    int index = input_to_index[expr];
+                    int index = input_to_index.at(expr);
                     AlgEl el({INPUT, index, 0, 0.0});
                     algorithm.push_back(el);
                     work_e.push_back(expr);
@@ -484,8 +484,8 @@ namespace symspals
                 // check if expr is a BinaryNode
                 else if (expr->is_binary())
                 {
-                    int index1 = expr_to_index[expr->dep(0)];
-                    int index2 = expr_to_index[expr->dep(1)];
+                    int index1 = expr_to_index.at(expr->dep(0));
+                    int index2 = expr_to_index.at(expr->dep(1));
                     if (expr->is_mult())
                     {
                         AlgEl el({MULT, index1, index2, 0.0});
@@ -511,20 +511,27 @@ namespace symspals
                 }
             }
             // add the output instruction
-            for (auto expr : output)
+            for(int i = 0; i < output.size(); i++)
             {
-                int index = expr_to_index[expr];
-                int index2 = output_to_index[expr];
-                AlgEl el({OUTPUT, index, index2, 0.0});
+                int index = expr_to_index.at(output.at(i));
+                AlgEl el({OUTPUT, index, i, 0.0});
                 algorithm.push_back(el);
-                work_e.push_back(expr);
+                work_e.push_back(output.at(i));
             }
+            // for (auto expr : output)
+            // {
+            //     int index = expr_to_index.at(expr);
+            //     int index2 = output_to_index.at(expr);
+            //     AlgEl el({OUTPUT, index, index2, 0.0});
+            //     algorithm.push_back(el);
+            //     work_e.push_back(expr);
+            // }
             output_size = output.size();
         }
         // call the function
         vector<double> Eval(const vector<double> &input)
         {
-            vector<double> result(output_size);
+            vector<double> result(output_size, 0);
             work.resize(0);
             work.reserve(algorithm.size());
             for (auto el : algorithm)
@@ -605,7 +612,70 @@ namespace symspals
         int output_size;
     };
 
-    TripletVec<Expression> GetCoefficients(const vector<Expression> &expr_vec, const vector<Expression> &sym_vec, const vector<Expression> &parametric_vec)
+    class CoefficientSimple
+    {
+    public:
+        unordered_map<Expression, int, Expression_hash> sym_to_index;
+        void solve(const Expression &expr, const int i, TripletVec<Expression> &ret)
+        {
+            // base case: expression is a sym of sym_vec
+            if (sym_to_index.find(expr) != sym_to_index.end())
+            {
+                ret.push_back({i, sym_to_index[expr], 1});
+                return;
+            }
+            else if (expr->is_zero())
+            {
+                return;
+            }
+            // if it's a multipication one of the childs should be a sym
+            else if (expr->is_mult())
+            {
+                if (sym_to_index.find(expr->dep(0)) != sym_to_index.end())
+                {
+                    ret.push_back({i, sym_to_index[expr->dep(0)], expr->dep(1)});
+                    return;
+                }
+                else if (sym_to_index.find(expr->dep(1)) != sym_to_index.end())
+                {
+                    ret.push_back({i, sym_to_index[expr->dep(1)], expr->dep(0)});
+                    return;
+                }
+                else
+                {
+                    // runtime error
+                    throw runtime_error("Error in CoefficientSimple solve");
+                }
+            }
+            else if (expr->is_plus())
+            {
+                // add the two childs
+                solve(expr->dep(0), i, ret);
+                solve(expr->dep(1), i, ret);
+                return;
+            }
+            else
+            {
+                // runtime error
+                throw runtime_error("Error in CoefficientSimple solve");
+            }
+        }
+        TripletVec<Expression> operator ()(const vector<Expression> &expr, const vector<Expression> &sym_vec)
+        {
+            TripletVec<Expression> ret;
+            for(int i =0; i<sym_vec.size(); i++){
+                sym_to_index[sym_vec[i]] = i;
+            }
+            for (int i = 0; i < expr.size(); i++)
+            {
+                solve(expr[i], i, ret);
+            }
+            return ret;
+        }
+    };
+
+    TripletVec<Expression>
+    GetCoefficients(const vector<Expression> &expr_vec, const vector<Expression> &sym_vec, const vector<Expression> &parametric_vec)
     {
         TripletVec<Expression> ret;
         vector<Expression> conc = sym_vec;
@@ -624,7 +694,7 @@ namespace symspals
                 {
                     continue;
                 }
-                ret.push_back(Triplet<Expression>(i, j, fwd[j]));
+                ret.push_back(Triplet<Expression>(j, i, fwd[j]));
             }
         }
         return ret;
