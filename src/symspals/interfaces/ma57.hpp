@@ -84,11 +84,11 @@ namespace symspals
             // icntl[14] = 0; // turn off automatic scaling
             Analyze();
             int nrhs = 1;            // number of right hand side being solved
-            int lw = 1.2 * n * nrhs; // length of w; lw>=n*nrhs
+            int lw = 12 * n * nrhs; // length of w; lw>=n*nrhs
             w.resize(lw);            // double workspace
-            lfact = 1.2 * info[8];
+            lfact = 12 * info[8];
             fact.resize(lfact);
-            lifact = 1.2 * info[9];
+            lifact = 12 * info[9];
             ifact.resize(lifact);
         }
         void Factorize()
@@ -110,7 +110,7 @@ namespace symspals
         void Solve(double *rhs)
         {
             int nrhs = 1;            // number of right hand side being solved
-            int lw = 1.2 * n * nrhs; // length of w; lw>=n*nrhs
+            int lw = 12 * n * nrhs; // length of w; lw>=n*nrhs
             // double *w = new double[lw]; // double workspace
             int lrhs = n; // integer, lenght of rhs
             // cout << ">>>>>>>>>>>>>>> started solving using ma57" << endl;
