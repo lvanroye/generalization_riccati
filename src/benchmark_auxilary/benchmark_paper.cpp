@@ -2,6 +2,7 @@
 #include "cart_pendulum_problem/cart_pendulum.hpp"
 #include "fatrop_problem_wrap.hpp"
 #include "benchmark_sparse.hpp"
+#include "benchmark_gen_riccati.hpp"
 #include <memory>
 using namespace genriccati_benchmark;
 using namespace std;
@@ -25,10 +26,19 @@ int main()
     auto ux0 = benchmark_sparse.kkt_system_.evaluator(benchmark_sparse.ux_syms[0]).Eval(sol);
     // print ux0 with for loop
     cout << "ux0 = [";
-    for (size_t i = 0; i < ux0.size(); i++)
+    for (size_t i = 0; i < 10; i++)
     {
         cout << ux0[i] << " ";
     }
     cout << "]" << endl;
+    BenchmarkGenRiccati benchmark_gen_riccati(cocp);
+    benchmark_gen_riccati.solve(cocp);
+    auto ux1 = benchmark_gen_riccati.ux[0];
+    // print ux1 with for loop
+    cout << "ux1 = [";
+    for (size_t i = 0; i < 10; i++)
+    {
+        cout << VECEL((VEC*) ux1, i) << " ";
+    }
     return 0;
 }
