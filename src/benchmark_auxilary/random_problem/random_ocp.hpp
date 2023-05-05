@@ -201,7 +201,7 @@ namespace genriccati_benchmark
         };
         void random_matrix(int n, int m, MAT *A, int ai, int aj)
         {
-            std::uniform_real_distribution<> dis(0.0, 1.0);
+            std::uniform_real_distribution<> dis(1e-2, 1e2);
             // fill the matrix with random values
             for (int i = 0; i < n; i++)
             {
@@ -213,7 +213,7 @@ namespace genriccati_benchmark
         }
         void random_lower_matrix(int n, MAT *A, int ai, int aj)
         {
-            std::uniform_real_distribution<> dis(0.0, 1.0);
+            std::uniform_real_distribution<> dis(1e-2, 1e2);
             // fill the matrix with random values
             for (int i = 0; i < n; i++)
             {
@@ -221,7 +221,7 @@ namespace genriccati_benchmark
                 {
                     MATEL(A, ai + i, aj + j) = dis(gen);
                 }
-                MATEL(A, ai + i, aj + i) = 1.0;
+                // MATEL(A, ai + i, aj + i) = 1.0;
             }
         }
 
