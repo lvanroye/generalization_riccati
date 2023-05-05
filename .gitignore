@@ -4,4 +4,3 @@ external/pardiso_shared_lib/*
 CMakeCache.txt
 .vscode/settings.json
 CMakeFiles/cmake.check_cache
-external/fatrop
