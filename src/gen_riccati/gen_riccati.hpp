@@ -113,6 +113,6 @@ namespace gen_riccati
         const int max_nu;
         const int max_nx;
         const int max_ng;
-        bool it_ref = true;
+        bool it_ref = false;
     };
 } // namespace gen_riccati

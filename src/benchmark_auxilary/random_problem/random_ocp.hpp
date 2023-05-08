@@ -33,7 +33,7 @@ namespace genriccati_benchmark
         }
         int get_nuk(const int k) const override
         {
-            return nu;
+            return (k!=K-1)?nu:0;
         };
         int get_ngk(const int k) const override
         {
@@ -98,6 +98,7 @@ namespace genriccati_benchmark
             MAT *res,
             const int k) override
         {
+            int nu = get_nuk(k);
             random_posdef_matrix(nu + nx, res, 0, 0);
             random_matrix(1, nu + nx,res, nu + nx, 0);
             return 0;
@@ -110,6 +111,7 @@ namespace genriccati_benchmark
             MAT *res,
             const int k) override
         {
+            int nu = get_nuk(k);
             if (k == 0)
             {
                 random_matrix(nu + nx + 1, ne_init, res, 0, 0);
@@ -201,7 +203,7 @@ namespace genriccati_benchmark
         };
         void random_matrix(int n, int m, MAT *A, int ai, int aj)
         {
-            std::uniform_real_distribution<> dis(1e-2, 1e2);
+            std::uniform_real_distribution<> dis(1e-1, 1e1);
             // fill the matrix with random values
             for (int i = 0; i < n; i++)
             {
@@ -213,7 +215,7 @@ namespace genriccati_benchmark
         }
         void random_lower_matrix(int n, MAT *A, int ai, int aj)
         {
-            std::uniform_real_distribution<> dis(1e-2, 1e2);
+            std::uniform_real_distribution<> dis(1e-1, 1e1);
             // fill the matrix with random values
             for (int i = 0; i < n; i++)
             {

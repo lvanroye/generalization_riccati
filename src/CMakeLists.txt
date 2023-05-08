@@ -1,6 +1,6 @@
-add_library(symspals SHARED symspals/symspals.cpp)
+add_library(symspals SHARED symspals/symspals.cpp symspals/timing.c)
 target_link_directories(symspals PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../external/pardiso_shared_lib)
-target_link_libraries(symspals MUMPS ma57lib pardiso gomp)
+target_link_libraries(symspals MUMPS ma57lib pardiso blas m)
 target_include_directories(symspals PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/symspals)
 add_executable(expressions_example symspals/expressions_example.cpp)
 add_executable(sparse_system_example symspals/sparse_system_example.cpp)

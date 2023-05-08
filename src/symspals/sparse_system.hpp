@@ -9,6 +9,10 @@
 #include <unordered_map>
 #include <algorithm>
 #include <unordered_set>
+extern "C"
+{
+#include "timing.h"
+}
 namespace symspals
 {
     class Parameter : public shared_ptr<Matrix<Expression>>
@@ -130,7 +134,11 @@ namespace symspals
             // solver_ptr->set_coefficient_matrix(coeffs_f.Eval(parameters_vals));
             solver_ptr->set_coefficient_matrix(eval_coeffs());
             solution = rhs_f.Eval(parameters_vals);
+            blasfeo_timer timer;
+            blasfeo_tic(&timer);
             solver_ptr->solve(solution);
+            double el = blasfeo_toc(&timer);
+            cout << "sparse solver time = " << el << endl;
         }
         bool is_lower_triangular()
         {
@@ -165,6 +173,7 @@ namespace symspals
         }
         void print_coeff_values()
         {
+            if(dirty) make_clean();
             eval_params();
             auto coeffs = coeffs_f.Eval(parameters_vals);
             for(size_t i = 0; i < coeffs.size(); i++)
