@@ -5,7 +5,7 @@ namespace genriccati_benchmark
 {
     /***
      * this class implements all necesssary functions of the OCPAbstract class to create a random OCP to be tested by the recursion
-    */
+     */
     class RandomOCP : public fatrop::OCPAbstract
     {
     public:
@@ -33,7 +33,9 @@ namespace genriccati_benchmark
         }
         int get_nuk(const int k) const override
         {
-            return (k!=K-1)?nu:0;
+            if (k == K - 1)
+                return 0;
+            return nu;
         };
         int get_ngk(const int k) const override
         {
@@ -98,9 +100,9 @@ namespace genriccati_benchmark
             MAT *res,
             const int k) override
         {
-            int nu = get_nuk(k);
-            random_posdef_matrix(nu + nx, res, 0, 0);
-            random_matrix(1, nu + nx,res, nu + nx, 0);
+            int nu_k = get_nuk(k);
+            random_posdef_matrix(nu_k + nx, res, 0, 0);
+            random_matrix(1, nu_k + nx, res, nu_k + nx, 0);
             return 0;
         };
         int eval_Ggtk(
@@ -111,18 +113,18 @@ namespace genriccati_benchmark
             MAT *res,
             const int k) override
         {
-            int nu = get_nuk(k);
+            int nu_k = get_nuk(k);
             if (k == 0)
             {
-                random_matrix(nu + nx + 1, ne_init, res, 0, 0);
+                random_matrix(nu_k + nx + 1, ne_init, res, 0, 0);
             }
             else if (k == K - 1)
             {
-                random_matrix(nu + nx + 1, ne_final, res, 0, 0);
+                random_matrix(nu_k + nx + 1, ne_final, res, 0, 0);
             }
             else
             {
-                random_matrix(nu + nx + 1, ne_middle, res, 0, 0);
+                random_matrix(nu_k + nx + 1, ne_middle, res, 0, 0);
             }
             return 0;
         };
@@ -203,6 +205,8 @@ namespace genriccati_benchmark
         };
         void random_matrix(int n, int m, MAT *A, int ai, int aj)
         {
+            // fill A with zeros
+            blasfeo_dgese(n, m, 0.0, A, ai, aj);
             std::uniform_real_distribution<> dis(1e-1, 1e1);
             // fill the matrix with random values
             for (int i = 0; i < n; i++)
@@ -215,6 +219,8 @@ namespace genriccati_benchmark
         }
         void random_lower_matrix(int n, MAT *A, int ai, int aj)
         {
+            // fill A with zeros
+            blasfeo_dgese(n, n, 0.0, A, ai, aj);
             std::uniform_real_distribution<> dis(1e-1, 1e1);
             // fill the matrix with random values
             for (int i = 0; i < n; i++)
@@ -229,27 +235,17 @@ namespace genriccati_benchmark
 
         void random_posdef_matrix(int n, MAT *A, int ai, int aj)
         {
-            // make a lower triangular matrix
-            random_lower_matrix(n, A, ai, aj);
-            // make it positive definite by multiplying with its transpose
-            // create a temporary matrix
+            // fill A with zeros
+            blasfeo_dgese(n, n, 0.0, A, ai, aj);
+            // create a temporary matrix B
             MAT B;
             blasfeo_allocate_dmat(n, n, &B);
-            // copy A to B
-            blasfeo_dgecp(n, n, A, ai, aj, &B, 0, 0);
-            // multiply B with its transpose and save to A, naive implementation
-            for (int i = 0; i < n; i++)
-            {
-                for (int j = 0; j < n; j++)
-                {
-                    double sum = 0.0;
-                    for (int k = 0; k <=i; k++)
-                    {
-                        sum += MATEL(&B, i, k) * MATEL(&B, j, k);
-                    }
-                    MATEL(A, ai + i, aj + j) = sum;
-                }
-            }
+            // make a lower triangular matrix
+            random_lower_matrix(n, &B, 0, 0);
+            // make it positive definite by multiplying with its transpose
+            // multiply B with its transpose and save to A
+            GEMM_NT(n, n, n, 1.0, &B, 0, 0, &B, 0, 0, 0.0, A, ai, aj, A, ai, aj);
+            GETR(n, n, A, 0, 0, A, 0, 0);
             // free the temporary matrix
             blasfeo_free_dmat(&B);
         }
