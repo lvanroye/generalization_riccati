@@ -86,7 +86,7 @@ namespace symspals
             // iparm[1] = 2; // METIS ordering
 
             // iparm[9] = 10; // no iterative refinement
-            iparm[7] = 0; /* Max numbers of iterative refinement steps. */
+            // iparm[7] = 0; /* Max numbers of iterative refinement steps. */
             // // iparm[10] = 2;
             iparm[12] = 1; // this is required for finding solutions
             // iparm[20] = 3; // Bunch-Kaufman pivoting + rescaling computed during factorization process

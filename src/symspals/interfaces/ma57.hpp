@@ -156,10 +156,10 @@ namespace symspals
         void Initialize()
         {
             ma57id_(cntl, icntl);
-            if (info[0] != 0)
-            {
-                cout << "init ma57 error " << info[0] << endl;
-            }
+            // if (info[0] != 0)
+            // {
+            //     cout << "init ma57 error " << info[0] << endl;
+            // }
             // icntl[4] = 4;
         }
         void Analyze()

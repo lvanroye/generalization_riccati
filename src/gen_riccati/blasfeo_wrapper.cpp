@@ -535,6 +535,7 @@ void FatropVecBF::copy(const FatropVecBF &fm)
 }
 void FatropVecBF::copyto(vector<double> &fm) const
 {
+    fm.resize(nels_);
     for (int ai = 0; ai < nels_; ai++)
     {
         fm.at(ai) = this->at(ai);

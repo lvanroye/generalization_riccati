@@ -32,7 +32,6 @@ namespace genriccati_benchmark
         }
         void populate_cocp(gen_riccati::COCP &cocp)
         {
-            least_squares_dual();
             eval_quantities();
             const int K = cocp.K;
             const gen_riccati::NumericVector nu = cocp.nu;
@@ -51,6 +50,13 @@ namespace genriccati_benchmark
                 // populate the discretized dynamics
                 blasfeo_dgecp(nu[k] + nx[k] + 1, nx[k + 1], (MAT *)kkt_memory.BAbt[k], 0, 0, (MAT *)cocp.BAbt[k], 0, 0);
             }
+        }
+        void take_step(const vector<double> &delta_x, const vector<double> &delta_lam)
+        {
+            fatropalg_->fatropdata_->delta_x = delta_x;
+            fatropalg_->fatropdata_->lam_calc = delta_lam;
+            fatropalg_->fatropdata_->update_trial_step(1.0, 1.0);
+            fatropalg_->fatropdata_->accept_trial_step();
         }
         gen_riccati::COCP create_cocp()
         {
@@ -74,7 +80,7 @@ namespace genriccati_benchmark
             fatropalg_->fatropdata_->delta_x.block(0, 10).print();
         }
 
-    private:
+    public:
         void least_squares_dual()
         {
 

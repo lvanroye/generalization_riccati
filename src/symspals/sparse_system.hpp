@@ -137,17 +137,21 @@ namespace symspals
             blasfeo_timer timer;
             blasfeo_tic(&timer);
             solver_ptr->solve(solution);
-            double el = blasfeo_toc(&timer);
-            cout << "sparse solver time = " << el << endl;
+            last_time_ = blasfeo_toc(&timer);
+            // cout << "sparse solver time = " << el << endl;
         }
         bool is_lower_triangular()
         {
             // iterate through triplets and check wether lower triangular
             return true;
         }
+        double last_time()
+        {
+            return last_time_;
+        }
         void residu(const vector<double> &sol, vector<double> &res)
         {
-            int n_vars = variables.size();
+            int n_vars = sol.size();
             res.resize(n_vars);
             vector<double> coeffs_vals = eval_coeffs();
             vector<double> rhs_vals = eval_rhs();
@@ -173,10 +177,11 @@ namespace symspals
         }
         void print_coeff_values()
         {
-            if(dirty) make_clean();
+            if (dirty)
+                make_clean();
             eval_params();
             auto coeffs = coeffs_f.Eval(parameters_vals);
-            for(size_t i = 0; i < coeffs.size(); i++)
+            for (size_t i = 0; i < coeffs.size(); i++)
             {
                 cout << "coeffs[" << sparsity[i].row << ", " << sparsity[i].col << "] = " << coeffs[i] << endl;
             }
@@ -193,6 +198,7 @@ namespace symspals
         Function rhs_f;
         string linear_solver = "mumps";
         unique_ptr<SparseSolverInterface> solver_ptr;
+        double last_time_;
 
     private:
         void make_clean(bool prune = false)
@@ -243,16 +249,16 @@ namespace symspals
             // initialize the function that computes the coefficients
             coeffs_f = Function(parameter_sym_vec, coeffs);
             rhs_f = Function(parameter_sym_vec, vec(rhss));
-            if(prune)
+            if (prune)
             {
                 eval_params();
                 auto coeff_vals = coeffs_f.Eval(parameters_vals);
                 // prune sparsity based on numerical values
                 vector<Index> new_sparsity;
                 vector<Expression> new_coeffs;
-                for(size_t i = 0; i < sparsity.size(); i++)
+                for (size_t i = 0; i < sparsity.size(); i++)
                 {
-                    if(coeff_vals[i] != 0)
+                    if (coeff_vals[i] != 0)
                     {
                         new_sparsity.push_back(sparsity[i]);
                         new_coeffs.push_back(coeffs[i]);
