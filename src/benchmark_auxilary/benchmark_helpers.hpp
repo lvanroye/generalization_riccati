@@ -66,15 +66,19 @@ public:
         auto cocp = fatrop_problem_wrap.create_cocp();
         // fatrop_problem_wrap.least_squares_dual();
         BenchmarkGenRiccati benchmark_gen_riccati(cocp);
-        fatrop_problem_wrap.populate_cocp(cocp);
-        benchmark_gen_riccati.ocp_ls_riccati.it_ref = it_ref;
-        benchmark_gen_riccati.solve(cocp);
-        double time;
-        double residu;
-        benchmark_gen_riccati.last_stats(time, residu);
-        res_time.push_back(time);
-        res_acc.push_back(residu);
+        for (int i = 0; i < 10; i++)
+        {
+            fatrop_problem_wrap.populate_cocp(cocp);
+            benchmark_gen_riccati.ocp_ls_riccati.it_ref = it_ref;
+            benchmark_gen_riccati.solve(cocp);
+            double time;
+            double residu;
+            benchmark_gen_riccati.last_stats(time, residu);
+            res_time.push_back(time);
+            res_acc.push_back(residu);
+        }
     }
+
     void sparse_solver(const string &solver_name, vector<double> &res_time, vector<double> &res_acc)
     {
         shared_ptr<OCPAbstract> ocp = make_shared<StageOCP>(CartPendulumProblem());
@@ -82,18 +86,24 @@ public:
         auto cocp = fatrop_problem_wrap.create_cocp();
         // fatrop_problem_wrap.least_squares_dual();
         BenchmarkSparse benchmark_sparse(cocp);
-        vector<double> sol;
         benchmark_sparse.kkt_system_.solver(solver_name);
         fatrop_problem_wrap.populate_cocp(cocp);
         benchmark_sparse.set_value(cocp);
-        benchmark_sparse.kkt_system_.solve(sol);
-        res_time.push_back(benchmark_sparse.kkt_system_.last_time());
-        vector<double> residu(sol.size(), 0);
-        benchmark_sparse.kkt_system_.residu(sol, residu);
-        // get inf norm of residu
-        double inf_norm = residu[0];
-        for (double r : residu)
-            inf_norm = std::max(inf_norm, std::abs(r));
-        res_acc.push_back(inf_norm);
+        benchmark_sparse.kkt_system_.numeric_prune();
+        for (int i = 0; i < 10; i++)
+        {
+            vector<double> sol;
+            fatrop_problem_wrap.populate_cocp(cocp);
+            benchmark_sparse.set_value(cocp);
+            benchmark_sparse.kkt_system_.solve(sol);
+            res_time.push_back(benchmark_sparse.kkt_system_.last_time());
+            vector<double> residu(sol.size(), 0);
+            benchmark_sparse.kkt_system_.residu(sol, residu);
+            // get inf norm of residu
+            double inf_norm = residu[0];
+            for (double r : residu)
+                inf_norm = std::max(inf_norm, std::abs(r));
+            res_acc.push_back(inf_norm);
+        }
+        };
     };
-};

@@ -35,7 +35,7 @@ namespace symspals
             int curr_no_els = 0;
             for (size_t i = 0; i < ind.size(); i++)
             {
-                if (curr_col != ind.at(i).col)
+                while (curr_col != ind.at(i).col)
                 {
                     // move to the next row
                     curr_col++;
