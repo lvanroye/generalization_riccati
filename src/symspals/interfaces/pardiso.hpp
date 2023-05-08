@@ -28,6 +28,7 @@ namespace symspals
             /* -------------------------------------------------------------------- */
             /* ..  Setup Pardiso control parameters.                                */
             /* -------------------------------------------------------------------- */
+            // print all triplets
             ia.resize(dim_ + 1);
             a.resize(nnz_);
             ja.resize(nnz_);
@@ -35,7 +36,7 @@ namespace symspals
             int curr_no_els = 0;
             for (size_t i = 0; i < ind.size(); i++)
             {
-                while (curr_col != ind.at(i).col)
+                while(curr_col != ind.at(i).col)
                 {
                     // move to the next row
                     curr_col++;

@@ -258,7 +258,7 @@ namespace symspals
                 vector<Expression> new_coeffs;
                 for (size_t i = 0; i < sparsity.size(); i++)
                 {
-                    if (coeff_vals[i] != 0)
+                    if (coeff_vals[i] != 0 || (sparsity[i].row == sparsity[i].col && linear_solver == "pardiso"))
                     {
                         new_sparsity.push_back(sparsity[i]);
                         new_coeffs.push_back(coeffs[i]);
