@@ -81,7 +81,7 @@ namespace symspals
             icntl[4] = 0; /* Print error. */
             // icntl[5] = 4; /* Use metis ordering */
 
-            // icntl[14] = 0; // turn off automatic scaling
+            icntl[14] = 0; // turn off automatic scaling
             Analyze();
             int nrhs = 1;            // number of right hand side being solved
             int lw = 12 * n * nrhs; // length of w; lw>=n*nrhs

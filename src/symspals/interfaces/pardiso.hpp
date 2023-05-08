@@ -85,10 +85,10 @@ namespace symspals
             iparm[2] = num_procs;
             // iparm[1] = 2; // METIS ordering
 
-            // iparm[9] = 0; // no iterative refinement
-            iparm[7] = 10; /* Max numbers of iterative refinement steps. */
+            // iparm[9] = 10; // no iterative refinement
+            iparm[7] = 0; /* Max numbers of iterative refinement steps. */
             // // iparm[10] = 2;
-            // iparm[12] = 1; // this is required for finding solutions
+            iparm[12] = 1; // this is required for finding solutions
             // iparm[20] = 3; // Bunch-Kaufman pivoting + rescaling computed during factorization process
 
             // these are the default options for IPOPT
@@ -101,9 +101,9 @@ namespace symspals
             // // // Options suggested by Olaf Schenk
             // iparm[9] = 12;
             // iparm[10] = 1; // Results in better scaling
-            // // // Matching information:  iparm[12] = 1 seems ok, but results in a
-            // // // large number of pivot perturbation
-            // // // Matching information:  iparm[12] = 2 robust,  but more  expensive method
+            // // Matching information:  iparm[12] = 1 seems ok, but results in a
+            // // large number of pivot perturbation
+            // // Matching information:  iparm[12] = 2 robust,  but more  expensive method
             // iparm[12] = 2;
 
             // iparm[20] = 3; // Results in better accuracy
