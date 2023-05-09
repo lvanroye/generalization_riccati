@@ -8,10 +8,11 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -fopenmp -O0 -DPANEL_SIZE=${PANEL_SIZE} -Wall -Wex
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native")
 set(CMAKE_C_FLAGS_RELEASE "-O3 -march=native")
 
-set(CMAKE_CXX_FLAGS_PROFILE "-O1 -march=native -fno-omit-frame-pointer")
-set(CMAKE_ASM_FLAGS_PROFILE "-O1 -march=native -fno-omit-frame-pointer")
-set(CMAKE_C_FLAGS_PROFILE "-O1 -march=native -fno-omit-frame-pointer")
-set(CMAKE_FORTRAN_FLAGS_PROFILE "-O1 -march=native -fno-omit-frame-pointer")
+set(CMAKE_CXX_FLAGS_PROFILE "-O1 -g -pg -fno-omit-frame-pointer -fno-inline-functions")
+set(CMAKE_ASM_FLAGS_PROFILE "-O1 -g -pg -fno-omit-frame-pointer -fno-inline-functions")
+set(CMAKE_C_FLAGS_PROFILE "-O1 -g -pg -fno-omit-frame-pointer -fno-inline-functions")
+set(CMAKE_FORTRAN_FLAGS_PROFILE "-O1 -pg -g -fno-omit-frame-pointer -fno-inline-functions")
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(external)
