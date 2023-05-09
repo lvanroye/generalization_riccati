@@ -1,6 +1,6 @@
 #pragma once
 #include "random_problem/random_ocp.hpp"
-#include "cart_pendulum_problem/cart_pendulum.hpp"
+#include "quadrotor_problem/quadrotor.hpp"
 #include "fatrop_problem_wrap.hpp"
 #include "benchmark_sparse.hpp"
 #include "benchmark_gen_riccati.hpp"
@@ -56,12 +56,12 @@ public:
         }
     }
 };
-class BenchmarkHelperCP
+class BenchmarkHelperQuadrotor
 {
 public:
     void gen_riccati(bool it_ref, vector<double> &res_time, vector<double> &res_acc)
     {
-        shared_ptr<OCPAbstract> ocp = make_shared<StageOCP>(CartPendulumProblem());
+        shared_ptr<OCPAbstract> ocp = make_shared<StageOCP>(QuadrotorProblem());
         FatropProblemWrap fatrop_problem_wrap(ocp);
         auto cocp = fatrop_problem_wrap.create_cocp();
         // fatrop_problem_wrap.least_squares_dual();
@@ -81,7 +81,7 @@ public:
 
     void sparse_solver(const string &solver_name, vector<double> &res_time, vector<double> &res_acc)
     {
-        shared_ptr<OCPAbstract> ocp = make_shared<StageOCP>(CartPendulumProblem());
+        shared_ptr<OCPAbstract> ocp = make_shared<StageOCP>(QuadrotorProblem());
         FatropProblemWrap fatrop_problem_wrap(ocp);
         auto cocp = fatrop_problem_wrap.create_cocp();
         // fatrop_problem_wrap.least_squares_dual();

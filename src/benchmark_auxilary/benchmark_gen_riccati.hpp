@@ -17,7 +17,9 @@ namespace genriccati_benchmark
         {
             blasfeo_timer timer;
             blasfeo_tic(&timer);
-            ocp_ls_riccati.solve_pd_sys_normal(cocp, 0.0, ux[0], lam[0]);
+            int res = ocp_ls_riccati.solve_pd_sys_normal(cocp, 0.0, ux[0], lam[0]);
+            if (res != 0)
+                std::cout << "error in solve_pd_sys_normal,  error = " << res << std::endl;
             last_time = blasfeo_toc(&timer);
             ocp_ls_riccati.get_rhs(cocp, rhs_rq[1], rhs_b[1], rhs_g[1]);
             ocp_ls_riccati.compute_pd_sys_times_vec(cocp, 0.0, 0.0, ux[0], lam[0], rhs_rq[0], rhs_b[0], rhs_g[0]);

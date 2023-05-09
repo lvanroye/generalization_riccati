@@ -3,7 +3,7 @@ int main()
 {
     vector<double> solve_time;
     vector<double> residu;
-    BenchmarkHelperCP benchmark_helper_cp;
+    BenchmarkHelperQuadrotor benchmark_helper_cp;
     benchmark_helper_cp.gen_riccati(true, solve_time, residu);
     benchmark_helper_cp.sparse_solver("ma57", solve_time, residu);
     // // print the residu results

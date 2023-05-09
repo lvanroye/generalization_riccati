@@ -92,6 +92,8 @@ namespace genriccati_benchmark
         }
         void eval_quantities()
         {
+            fatropalg_->fatropdata_->reset();
+            // least_squares_dual();
             // eval initial constraint jacobian
             fatropalg_->eval_constr_jac();
             // eval initial lagrangian hessian

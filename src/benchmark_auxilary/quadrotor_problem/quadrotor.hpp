@@ -6,12 +6,12 @@
 #include "rockit_generated/problem_information.h"
 using namespace fatrop;
 
-class CartPendulumProblem : public StageOCP
+class QuadrotorProblem : public StageOCP
 {
     public:
 #define INSTANTIATE_EVAL_CAS_GEN(FUNCTION_NAME) \
     EvalCasGen(&FUNCTION_NAME##_incref, &FUNCTION_NAME##_decref, &FUNCTION_NAME##_checkout, &FUNCTION_NAME##_release, &FUNCTION_NAME##_n_in, &FUNCTION_NAME##_n_out, &FUNCTION_NAME##_sparsity_in, &FUNCTION_NAME##_sparsity_out, &FUNCTION_NAME##_work, &FUNCTION_NAME)
-    CartPendulumProblem():StageOCP(
+    QuadrotorProblem():StageOCP(
         MACRO_nu,
         MACRO_nx,
         MACRO_ngI,
