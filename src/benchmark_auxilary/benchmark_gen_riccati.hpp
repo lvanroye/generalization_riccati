@@ -31,6 +31,12 @@ namespace genriccati_benchmark
             time = last_time;
             res = last_res;
         }
+        void controle()
+        {
+            // first 10 numbers of ux[0]
+            for (int i = 0; i < 10; i++)
+                std::cout << VECEL((VEC*) ux[0], i) << " ";
+        }
         gen_riccati::OCPLSRiccati ocp_ls_riccati;
         gen_riccati::FatropMemoryVecBF ux;
         gen_riccati::FatropMemoryVecBF lam;
