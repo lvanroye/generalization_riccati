@@ -551,7 +551,7 @@ int OCPLSRiccati::solve_pd_sys_normal(
     // cout << "el time fact solve" << el << endl; //
     if (it_ref)
     {
-        const int min_it_ref = 0;
+        const int min_it_ref = 1;
         double err_curr = 0.0;
         // copy(ux, ux_test[0]);
         // copy(lam, lam_test[0]);
