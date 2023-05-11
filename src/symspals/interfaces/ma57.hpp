@@ -71,7 +71,7 @@ namespace symspals
 
             Initialize();
             // number of iterative refinements
-            icntl[8] = 0;
+            // icntl[8] = 0;
             ///// these are the default settings of IPOPT
             /* Custom settings for MA57. */
             icntl[0] = 0; /* Error stream */

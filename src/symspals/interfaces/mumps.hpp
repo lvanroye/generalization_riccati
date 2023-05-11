@@ -63,7 +63,7 @@ namespace symspals
             id.ICNTL(2) = 6;
             id.ICNTL(3) = 6;
             id.ICNTL(4) = 0; // printing level
-            id.ICNTL(10) = 0; // max no iterative refinement steps
+            // id.ICNTL(10) = 0; // max no iterative refinement steps
             id.job = 1;
             dmumps_c(&id);
             if (id.infog[0] < 0)
