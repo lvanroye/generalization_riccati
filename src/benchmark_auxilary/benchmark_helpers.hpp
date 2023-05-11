@@ -16,7 +16,7 @@ public:
         FatropProblemWrap fatrop_problem_wrap(ocp);
         auto cocp = fatrop_problem_wrap.create_cocp();
         BenchmarkGenRiccati benchmark_gen_riccati(cocp);
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 11; i++)
         {
             ocp->set_seed(i);
             // fatrop_problem_wrap.least_squares_dual();
@@ -26,8 +26,11 @@ public:
             double time;
             double residu;
             benchmark_gen_riccati.last_stats(time, residu);
-            res_time.push_back(time);
-            res_acc.push_back(residu);
+            if (i != 0)
+            {
+                res_time.push_back(time);
+                res_acc.push_back(residu);
+            }
         }
     }
     void sparse_solver(const string &solver_name, int K, int nx, int nu, int ne_init, int ne_middle, int ne_final, vector<double> &res_time, vector<double> &res_acc)
@@ -90,12 +93,13 @@ public:
         fatrop_problem_wrap.populate_cocp(cocp);
         benchmark_sparse.set_value(cocp);
         benchmark_sparse.kkt_system_.numeric_prune();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 11; i++)
         {
             vector<double> sol;
             fatrop_problem_wrap.populate_cocp(cocp);
             benchmark_sparse.set_value(cocp);
             benchmark_sparse.kkt_system_.solve(sol);
+            if(i != 0)
             res_time.push_back(benchmark_sparse.kkt_system_.last_time());
             vector<double> residu(sol.size(), 0);
             benchmark_sparse.kkt_system_.residu(sol, residu);
@@ -103,7 +107,8 @@ public:
             double inf_norm = residu[0];
             for (double r : residu)
                 inf_norm = std::max(inf_norm, std::abs(r));
+            if(i != 0)
             res_acc.push_back(inf_norm);
         }
-        };
     };
+};

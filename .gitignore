@@ -7,3 +7,4 @@ CMakeCache.txt
 .vscode/settings.json
 CMakeFiles/cmake.check_cache
 .vscode/
+release/
