@@ -120,7 +120,7 @@ namespace symspals
             {
                 cout << "solve ma57 error " << info[0] << endl;
             }
-            cout << "ma57 number of delayed pivos " << info[22] << endl;
+            // cout << "ma57 number of delayed pivos " << info[22] << endl;
             // cout << ">>>>>>>>>>>>>>> finished solving using ma57" << endl;
             // delete[] w;
         }

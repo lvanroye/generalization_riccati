@@ -19,3 +19,6 @@ target_link_libraries(benchmark_paper fatrop symspals blasfeo gen_riccati)
 
 add_executable(benchmark_quadrotor benchmark_auxilary/benchmark_quadrotor.cpp)
 target_link_libraries(benchmark_quadrotor fatrop symspals blasfeo gen_riccati)
+
+add_executable(benchmark_random benchmark_auxilary/benchmark_random.cpp)
+target_link_libraries(benchmark_random fatrop symspals blasfeo gen_riccati)
