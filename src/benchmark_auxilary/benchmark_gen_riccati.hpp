@@ -22,11 +22,12 @@ namespace genriccati_benchmark
                 std::cout << "error in solve_pd_sys_normal,  error = " << res << std::endl;
             last_time = blasfeo_toc(&timer);
             ocp_ls_riccati.get_rhs(cocp, rhs_rq[1], rhs_b[1], rhs_g[1]);
+            double max_norm = std::max(Linf(rhs_rq[1]), std::max(Linf(rhs_b[1]), Linf(rhs_g[1])));
             ocp_ls_riccati.compute_pd_sys_times_vec(cocp, 0.0, 0.0, ux[0], lam[0], rhs_rq[0], rhs_b[0], rhs_g[0]);
             axpby(1.0, rhs_rq[0], 1.0, rhs_rq[1], rhs_rq[0]);
             axpby(1.0, rhs_b[0], 1.0, rhs_b[1], rhs_b[0]);
             axpby(1.0, rhs_g[0], 1.0, rhs_g[1], rhs_g[0]);
-            last_res = std::max(Linf(rhs_rq[0]), std::max(Linf(rhs_b[0]), Linf(rhs_g[0])));
+            last_res = std::max(Linf(rhs_rq[0]), std::max(Linf(rhs_b[0]), Linf(rhs_g[0]))) / max_norm;
         }
         void last_stats(double &time, double &res)
         {
@@ -37,7 +38,7 @@ namespace genriccati_benchmark
         {
             // first 10 numbers of ux[0]
             for (int i = 0; i < 10; i++)
-                std::cout << VECEL((VEC*) ux[0], i) << " ";
+                std::cout << VECEL((VEC *)ux[0], i) << " ";
         }
         gen_riccati::OCPLSRiccati ocp_ls_riccati;
         gen_riccati::FatropMemoryVecBF ux;

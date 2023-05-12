@@ -55,7 +55,7 @@ public:
             double inf_norm = residu[0];
             for (double r : residu)
                 inf_norm = std::max(inf_norm, std::abs(r));
-            res_acc.push_back(inf_norm);
+            res_acc.push_back(inf_norm / benchmark_sparse.kkt_system_.rhs_inf_norm());
         }
     }
 };
@@ -99,16 +99,16 @@ public:
             fatrop_problem_wrap.populate_cocp(cocp);
             benchmark_sparse.set_value(cocp);
             benchmark_sparse.kkt_system_.solve(sol);
-            if(i != 0)
-            res_time.push_back(benchmark_sparse.kkt_system_.last_time());
+            if (i != 0)
+                res_time.push_back(benchmark_sparse.kkt_system_.last_time());
             vector<double> residu(sol.size(), 0);
             benchmark_sparse.kkt_system_.residu(sol, residu);
             // get inf norm of residu
             double inf_norm = residu[0];
             for (double r : residu)
                 inf_norm = std::max(inf_norm, std::abs(r));
-            if(i != 0)
-            res_acc.push_back(inf_norm);
+            if (i != 0)
+                res_acc.push_back(inf_norm / benchmark_sparse.kkt_system_.rhs_inf_norm());
         }
     };
 };

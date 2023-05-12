@@ -171,6 +171,14 @@ namespace symspals
                     res[col] += coeffs_vals[i] * sol[row];
             }
         }
+        double rhs_inf_norm()
+        {
+            vector<double> rhs_vals = eval_rhs();
+            double max_rhs = 0.0;
+            for (auto r : rhs_vals)
+                max_rhs = std::max(max_rhs, std::abs(r));
+            return max_rhs;
+        }
         void numeric_prune()
         {
             make_clean(true);

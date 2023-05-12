@@ -221,7 +221,7 @@ namespace genriccati_benchmark
         {
             // fill A with zeros
             blasfeo_dgese(n, n, 0.0, A, ai, aj);
-            std::uniform_real_distribution<> dis(1e-1, 1e1);
+            std::uniform_real_distribution<> dis(1e-1, 1e0);
             // fill the matrix with random values
             for (int i = 0; i < n; i++)
             {
