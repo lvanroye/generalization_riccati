@@ -27,10 +27,17 @@ double std_dev(vector<double> &vec)
         sum += (v - m) * (v - m);
     return sqrt(sum / vec.size());
 }
-void process_results(vector<double> &solve_time, vector<double> &residu, vector<double> &solve_time_mean, vector<double> &residu_mean, vector<double> &solve_time_std, vector<double> &residu_std)
+double inf_norm(vector<double> &vec)
+{
+    double max = 0;
+    for (double v : vec)
+        max = std::max(max, std::abs(v));
+    return max;
+}
+void process_results(vector<double> &solve_time, vector<double> &residu, vector<double> &solve_time_mean, vector<double> &residu_inf, vector<double> &solve_time_std, vector<double> &residu_std)
 {
     solve_time_mean.push_back(mean(solve_time));
-    residu_mean.push_back(mean(residu));
+    residu_inf.push_back(inf_norm(residu));
     solve_time_std.push_back(std_dev(solve_time));
     residu_std.push_back(std_dev(residu));
     solve_time.clear();
@@ -76,7 +83,7 @@ int main()
         for (int K : Karr)
         {
             vector<double> solve_time_mean;
-            vector<double> residu_mean;
+            vector<double> residu_inf;
             vector<double> solve_time_std;
             vector<double> residu_std;
             vector<double> solve_time;
@@ -88,18 +95,18 @@ int main()
             int ne_middle = 0;
             int ne_final = 10;
             benchmark_helper_cp.gen_riccati(K, nx, nu, ne_init, ne_middle, ne_final, true, true, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_mean, solve_time_std, residu_std);
+            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             benchmark_helper_cp.gen_riccati(K, nx, nu, ne_init, ne_middle, ne_final, false, true, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_mean, solve_time_std, residu_std);
+            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             benchmark_helper_cp.sparse_solver("ma57", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_mean, solve_time_std, residu_std);
+            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             benchmark_helper_cp.sparse_solver("mumps", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_mean, solve_time_std, residu_std);
+            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             benchmark_helper_cp.sparse_solver("pardiso", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_mean, solve_time_std, residu_std);
+            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             // add to matrix
             solve_time_mean_matrix.push_back(solve_time_mean);
-            residu_mean_matrix.push_back(residu_mean);
+            residu_mean_matrix.push_back(residu_inf);
             solve_time_std_matrix.push_back(solve_time_std);
             residu_std_matrix.push_back(residu_std);
         }
@@ -107,7 +114,7 @@ int main()
         cout << "mean time" << endl;
         print_header("K", {"Riccati with iterative refinement", "Riccati without iterative refinement", "Sparse solver ma57", "Sparse solver mumps", "Sparse solver pardiso"});
         print_matrix(Karr, solve_time_mean_matrix);
-        cout << "mean residu" << endl;
+        cout << "max residu" << endl;
         print_header("K", {"Riccati with iterative refinement", "Riccati without iterative refinement", "Sparse solver ma57", "Sparse solver mumps", "Sparse solver pardiso"});
         print_matrix(Karr, residu_mean_matrix);
     }
@@ -121,7 +128,7 @@ int main()
         for (int nx : nxarr)
         {
             vector<double> solve_time_mean;
-            vector<double> residu_mean;
+            vector<double> residu_inf;
             vector<double> solve_time_std;
             vector<double> residu_std;
             vector<double> solve_time;
@@ -133,18 +140,18 @@ int main()
             int ne_middle = nx/4;
             int ne_final = nx/4;
             benchmark_helper_cp.gen_riccati(K, nx, nu, ne_init, ne_middle, ne_final, true, true, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_mean, solve_time_std, residu_std);
+            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             benchmark_helper_cp.gen_riccati(K, nx, nu, ne_init, ne_middle, ne_final, false, true, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_mean, solve_time_std, residu_std);
+            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             benchmark_helper_cp.sparse_solver("ma57", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_mean, solve_time_std, residu_std);
+            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             benchmark_helper_cp.sparse_solver("mumps", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_mean, solve_time_std, residu_std);
+            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             benchmark_helper_cp.sparse_solver("pardiso", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_mean, solve_time_std, residu_std);
+            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             // add to matrix
             solve_time_mean_matrix.push_back(solve_time_mean);
-            residu_mean_matrix.push_back(residu_mean);
+            residu_mean_matrix.push_back(residu_inf);
             solve_time_std_matrix.push_back(solve_time_std);
             residu_std_matrix.push_back(residu_std);
         }

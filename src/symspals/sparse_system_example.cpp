@@ -16,7 +16,7 @@ int main()
     /* 
     choose a solver
     */
-    kkt.solver("mumps");
+    kkt.solver("pardiso");
     /* 
     set the parameters
     */
