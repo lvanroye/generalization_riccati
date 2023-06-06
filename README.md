@@ -1,4 +1,4 @@
-This repository accompagnies the Wiley paper "Generalization Riccati Recursion". The purpose of the paper is:
+This repository accompagnies the Wiley paper "A Generalization of the Riccati Recursion for Equality-Constrained Linear Quadratic Optimal Control". The purpose of the repository is:
 
 - reproducable benchmark results and possibility to test out performance on other platforms and for other problems
   
