@@ -11,8 +11,8 @@ bool gen_riccati::check_reg(const int m, MAT *sA, const int ai, const int aj)
     return true;
 }
 OCPLSRiccati::OCPLSRiccati(const COCP &cocp) : Ppt(cocp.nx + 1, cocp.nx, cocp.K),
-                                               Hh(cocp.nx, cocp.nx + 1, cocp.K), // the number of eqs can never exceed nx
-                                               AL(vector<int>(1, max(cocp.nu + cocp.nx + 1)), vector<int>(1, max(cocp.nx)), 1),
+                                               Hh(cocp.nx, cocp.nx + 1, cocp.K), // the number of eqs can never exceed nx + nu
+                                               AL(vector<int>(1, max(cocp.nu + cocp.nx + 1)), vector<int>(1, max(cocp.nx + cocp.nu)), 1),
                                                RSQrqt_tilde(cocp.nu + cocp.nx + 1, cocp.nx + cocp.nu, cocp.K), // TODO, only save first rho rows (can never exceed nu)
                                                Ggt_stripe(vector<int>(1, max(cocp.nu + cocp.nx + 1)), vector<int>(1, max(cocp.nx + cocp.nu)), 1),
                                                Ggt_tilde(cocp.nu + cocp.nx + 1, cocp.nx + cocp.nu, cocp.K), // TODO, only save first rho rows (can never exceed nu)
@@ -35,7 +35,7 @@ OCPLSRiccati::OCPLSRiccati(const COCP &cocp) : Ppt(cocp.nx + 1, cocp.nx, cocp.K)
                                                lam_test(sum(cocp.ng) + sum(cocp.nx) - cocp.nx[0], 1),
                                                v_Ppt(cocp.nx, cocp.K),
                                                v_Hh(cocp.nx, cocp.K),
-                                               v_AL(vector<int>(1, max(cocp.nx)), 1),
+                                               v_AL(vector<int>(1, max(cocp.nx + cocp.nu)), 1),
                                                v_RSQrqt_tilde(cocp.nu + cocp.nx, cocp.K),
                                                v_Ggt_stripe(vector<int>(1, max(cocp.nx + cocp.nu)), 1),
                                                v_Ggt_tilde(cocp.nu + cocp.nx, cocp.K),
