@@ -16,7 +16,7 @@ namespace genriccati_benchmark
         FatropProblemWrap(const std::shared_ptr<fatrop::OCPAbstract> &ocp)
         {
             ocp_ = ocp;
-            auto adapter = std::make_shared<fatrop::OCPAdapter>(ocp);
+            auto adapter = std::make_shared<fatrop::OCPAdapter>(ocp, make_shared<FatropOptions>());
             std::shared_ptr<fatrop::FatropOptions> fatropoptions_ = std::make_shared<fatrop::FatropOptions>();
             std::shared_ptr<fatrop::FatropData> fatropdata_;
             std::shared_ptr<fatrop::FatropNLP> nlp_;

@@ -18,7 +18,7 @@ dependencies: blasfeo
 
 dependencies: sparse linear solvers: mumps, ma57 and pardiso
 
-to compile, make sure to obtain the source and binary files of ma57 and pardiso, respectively. Place them at the following locations: external/ma57_src/ddeps.f external/ma57_src/fakemetis.f external/ma57_src/ma57d.f and external/pardiso_shared_lib/libpardiso.so
+to compile, make sure to obtain the source and binary files of ma57 and pardiso, respectively. Place them at the following locations: external/ma57_src/ddeps.f external/ma57_src/fakemetis.f external/ma57_src/ma57d.f and external/pardiso_shared_lib/libpardiso.so.
 
 - the code for performing the benchmark of the paper: here we have a dependency on fatrop for setting up the problems
 

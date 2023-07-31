@@ -64,7 +64,7 @@ class BenchmarkHelperQuadrotor
 public:
     void gen_riccati(bool it_ref, vector<double> &res_time, vector<double> &res_acc)
     {
-        shared_ptr<OCPAbstract> ocp = make_shared<StageOCP>(QuadrotorProblem());
+        shared_ptr<OCPAbstract> ocp = make_shared<StageOCPRockit>(QuadrotorProblem());
         FatropProblemWrap fatrop_problem_wrap(ocp);
         auto cocp = fatrop_problem_wrap.create_cocp();
         // fatrop_problem_wrap.least_squares_dual();
@@ -84,7 +84,7 @@ public:
 
     void sparse_solver(const string &solver_name, vector<double> &res_time, vector<double> &res_acc)
     {
-        shared_ptr<OCPAbstract> ocp = make_shared<StageOCP>(QuadrotorProblem());
+        shared_ptr<OCPAbstract> ocp = make_shared<StageOCPRockit>(QuadrotorProblem());
         FatropProblemWrap fatrop_problem_wrap(ocp);
         auto cocp = fatrop_problem_wrap.create_cocp();
         // fatrop_problem_wrap.least_squares_dual();
