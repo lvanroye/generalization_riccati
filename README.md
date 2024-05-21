@@ -25,4 +25,25 @@ to compile, make sure to obtain the source and binary files of ma57 and pardiso,
 dependencies: symspals, gen_riccati and fatrop
 
 
+citing: 
+
+if you use this code, please cite the paper as follows:
+
+```
+@article{vanroye2024generalization,
+  title={A generalization of the Riccati recursion for equality-constrained linear quadratic optimal control},
+  author={Vanroye, Lander and De Schutter, Joris and Decr{\'e}, Wilm},
+  journal={Optimal Control Applications and Methods},
+  volume={45},
+  number={1},
+  pages={436--454},
+  year={2024},
+  publisher={Wiley Online Library}
+}
+```
+
+
+
 Known issues: not possible to use ma57 and mumps with metis library at the same time because ma57 
+
+
