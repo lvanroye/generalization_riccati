@@ -1,4 +1,22 @@
+/*
+Fatrop - A fast trajectory optimization solver
+ Copyright (C) 2022 - 2024 Lander Vanroye, KU Leuven. All rights reserved.
 
+This file is part of Fatrop.
+
+Fatrop is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Fatrop is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Fatrop.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "benchmark_helpers.hpp"
 void print_results(vector<double> &solve_time, vector<double> &residu, const string &solver_name)
 {
@@ -79,7 +97,7 @@ int main()
         vector<vector<double>> solve_time_std_matrix;
         vector<vector<double>> residu_std_matrix;
         vector<vector<double>> solve_time_matrix;
-        vector<int> Karr = {10, 16, 27, 46, 77, 129, 215, 359, 599, 1000};
+        vector<int> Karr = {10, 50, 100, 200};
         for (int K : Karr)
         {
             vector<double> solve_time_mean;
@@ -89,21 +107,21 @@ int main()
             vector<double> solve_time;
             vector<double> residu;
             // int K = 100;
-            int nx = 10;
-            int nu = 5;
-            int ne_init = 10;
+            int nx = 50;
+            int nu = 25;
+            int ne_init = 50;
             int ne_middle = 0;
-            int ne_final = 10;
+            int ne_final = 0;
             benchmark_helper_cp.gen_riccati(K, nx, nu, ne_init, ne_middle, ne_final, true, true, solve_time, residu);
             process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             benchmark_helper_cp.gen_riccati(K, nx, nu, ne_init, ne_middle, ne_final, false, true, solve_time, residu);
             process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
-            benchmark_helper_cp.sparse_solver("ma57", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
-            benchmark_helper_cp.sparse_solver("mumps", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
-            benchmark_helper_cp.sparse_solver("pardiso", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
+            // benchmark_helper_cp.sparse_solver("ma57", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
+            // process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
+            // benchmark_helper_cp.sparse_solver("mumps", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
+            // process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
+            // benchmark_helper_cp.sparse_solver("pardiso", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
+            // process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             // add to matrix
             solve_time_mean_matrix.push_back(solve_time_mean);
             residu_mean_matrix.push_back(residu_inf);
@@ -143,12 +161,12 @@ int main()
             process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             benchmark_helper_cp.gen_riccati(K, nx, nu, ne_init, ne_middle, ne_final, false, true, solve_time, residu);
             process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
-            benchmark_helper_cp.sparse_solver("ma57", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
-            benchmark_helper_cp.sparse_solver("mumps", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
-            benchmark_helper_cp.sparse_solver("pardiso", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
-            process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
+            // benchmark_helper_cp.sparse_solver("ma57", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
+            // process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
+            // benchmark_helper_cp.sparse_solver("mumps", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
+            // process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
+            // benchmark_helper_cp.sparse_solver("pardiso", K, nx, nu, ne_init, ne_middle, ne_final, solve_time, residu);
+            // process_results(solve_time, residu, solve_time_mean, residu_inf, solve_time_std, residu_std);
             // add to matrix
             solve_time_mean_matrix.push_back(solve_time_mean);
             residu_mean_matrix.push_back(residu_inf);
