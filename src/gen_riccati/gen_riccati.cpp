@@ -1113,7 +1113,7 @@ int OCPLSRiccati::solve_rhs(
         {
             //             rankI = 0;
             //             POTRF_L_MN(nx + 1, nx, Ppt_p, 0, 0, LlIt_p, 0, 0);
-            TRSV_LNN(nx, LlIt_p, 0, 0, v_LlIt_p, 0, v_LlIt_p, 0);
+            TRSV_LNN(nx, LlIt_p, 0, 0, v_Ppt_p, 0, v_LlIt_p, 0);
             //             if (!check_reg(nx, LlIt_p, 0, 0))
             //                 return 2;
         }
